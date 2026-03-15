@@ -1,0 +1,365 @@
+{% extends "cms/base.html" %}
+
+{% block title %}<title>Homepage | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="space-y-6">
+    <div class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-blue-600">Homepage Control</p>
+        <div class="mt-3 flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-black tracking-tight text-slate-900">Homepage Manager</h1>
+                <p class="mt-2 max-w-3xl text-sm leading-7 text-slate-600">Work on one homepage section at a time from the sidebar submenu instead of scrolling through the full page configuration.</p>
+            </div>
+            <div class="rounded-[22px] border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700">
+                Active section: {{ cms_subsection|default:"overview"|cut:"-"|title }}
+            </div>
+        </div>
+    </div>
+
+    {% if cms_subsection == "site" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Global Shell</p>
+                <h2 class="mt-2 text-2xl font-black text-slate-900">Site Settings</h2>
+                <p class="mt-2 text-sm text-slate-600">Header, footer, quick actions, and the contact auto-reply message.</p>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Header / Footer</span>
+        </div>
+        <form method="post" id="siteSettingsForm" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="site">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in site_form %}
+                    {% if field.name != 'contact_auto_reply_message_json' %}
+                    <div class="{% if field.name == 'footer_newsletter_text' or field.name == 'footer_cta_title' or field.name == 'footer_address' or field.name == 'footer_copyright_text' or field.name == 'quick_action_email_url' or field.name == 'quick_action_whatsapp_url' or field.name == 'quick_action_contact_url' %}md:col-span-2{% endif %}">
+                        {% include "cms/includes/form_field.html" with field=field %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <section class="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5">
+                <div>
+                    <h3 class="text-lg font-black text-slate-900">Contact Auto Reply</h3>
+                    <p class="mt-1 text-sm text-slate-600">The greeting and thank-you line stay fixed. The body below is written with Editor.js and sent as HTML to the customer.</p>
+                </div>
+                {{ site_form.contact_auto_reply_message_json }}
+                {% if site_form.contact_auto_reply_message_json.errors %}<p class="text-sm text-red-600">{{ site_form.contact_auto_reply_message_json.errors|join:", " }}</p>{% endif %}
+                <div id="siteReplyEditor" class="min-h-[280px] rounded-[20px] border border-slate-200 bg-white p-4"></div>
+            </section>
+            {% if can_change_site %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Site Settings</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "hero-copy" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Homepage Copy</p>
+            <h2 class="mt-2 text-2xl font-black text-slate-900">Hero Copy</h2>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in homepage_form %}
+                    {% if field.name in home_hero_fields %}
+                    <div class="{% if field.name == 'hero_right_description' %}md:col-span-2{% endif %}">
+                        {% include "cms/includes/form_field.html" with field=field %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% for field in homepage_form %}
+                {% if field.name not in home_hero_fields %}{{ field.as_hidden }}{% endif %}
+            {% endfor %}
+            {% if can_change_homepage %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Hero Copy</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "why-choose-copy" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Homepage Copy</p>
+            <h2 class="mt-2 text-2xl font-black text-slate-900">Why Choose Us Copy</h2>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in homepage_form %}
+                    {% if field.name in home_why_choose_copy_fields %}
+                    <div class="{% if field.name == 'why_choose_description' or field.name == 'why_choose_image_url' or field.name == 'why_choose_highlight_text' %}md:col-span-2{% endif %}">
+                        {% include "cms/includes/form_field.html" with field=field %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% for field in homepage_form %}
+                {% if field.name not in home_why_choose_copy_fields %}{{ field.as_hidden }}{% endif %}
+            {% endfor %}
+            {% if can_change_homepage %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Why Choose Copy</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "featured" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Homepage Copy</p>
+            <h2 class="mt-2 text-2xl font-black text-slate-900">Featured Sections</h2>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in homepage_form %}
+                    {% if field.name in home_featured_fields %}
+                    <div class="{% if field.name == 'projects_title' or field.name == 'blogs_title' or field.name == 'faqs_side_image_url' %}md:col-span-2{% endif %}">
+                        {% include "cms/includes/form_field.html" with field=field %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% for field in homepage_form %}
+                {% if field.name not in home_featured_fields %}{{ field.as_hidden }}{% endif %}
+            {% endfor %}
+            {% if can_change_homepage %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Featured Sections</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "final-cta" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Homepage Copy</p>
+            <h2 class="mt-2 text-2xl font-black text-slate-900">Final CTA</h2>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in homepage_form %}
+                    {% if field.name in home_final_cta_fields %}
+                    <div class="{% if field.name == 'final_cta_title' or field.name == 'final_cta_description' %}md:col-span-2{% endif %}">
+                        {% include "cms/includes/form_field.html" with field=field %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% for field in homepage_form %}
+                {% if field.name not in home_final_cta_fields %}{{ field.as_hidden }}{% endif %}
+            {% endfor %}
+            {% if can_change_homepage %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Final CTA</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "seo" %}
+    <article class="rounded-[32px] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-6 shadow-[0_30px_90px_rgba(15,23,42,0.06)]">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-blue-600">Search Metadata</p>
+            <h2 class="mt-2 text-2xl font-black text-slate-900">Homepage SEO</h2>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in homepage_form %}
+                    {% if field.name in seo_field_names %}
+                    <div class="{% if field.name == 'seo_meta_description' or field.name == 'seo_og_description' or field.name == 'seo_schema_json_ld' %}md:col-span-2{% endif %}">
+                        {% include "cms/includes/form_field.html" with field=field %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% for field in homepage_form %}
+                {% if field.name not in seo_field_names %}{{ field.as_hidden }}{% endif %}
+            {% endfor %}
+            {% if can_change_homepage %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Save Homepage SEO</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "hero-slides" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Hero Carousel</p>
+                <h2 class="mt-2 text-2xl font-black text-slate-900">Hero Slides</h2>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ hero_formset.total_form_count }} items</span>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="hero">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            {{ hero_formset.management_form }}
+            <div class="grid gap-4 lg:grid-cols-2">
+                {% for form in hero_formset %}
+                <article class="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                    {{ form.id }}
+                    <div class="grid gap-4">
+                        {% include "cms/includes/form_field.html" with field=form.order %}
+                        {% include "cms/includes/form_field.html" with field=form.image_url %}
+                        {% include "cms/includes/form_field.html" with field=form.badge %}
+                        {% include "cms/includes/form_field.html" with field=form.title %}
+                        {% include "cms/includes/form_field.html" with field=form.description %}
+                        {% if form.instance.pk %}{% include "cms/includes/form_field.html" with field=form.DELETE %}{% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% if can_change_hero %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Hero Slides</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "core-features" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Feature Grid</p>
+                <h2 class="mt-2 text-2xl font-black text-slate-900">Core Features</h2>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ core_formset.total_form_count }} items</span>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="core">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            {{ core_formset.management_form }}
+            <div class="space-y-4">
+                {% for form in core_formset %}
+                <article class="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                    {{ form.id }}
+                    <div class="grid gap-4">
+                        {% include "cms/includes/form_field.html" with field=form.order %}
+                        {% include "cms/includes/form_field.html" with field=form.icon_class %}
+                        {% include "cms/includes/form_field.html" with field=form.title %}
+                        {% include "cms/includes/form_field.html" with field=form.description %}
+                        {% include "cms/includes/form_field.html" with field=form.cta_text %}
+                        {% include "cms/includes/form_field.html" with field=form.cta_url %}
+                        {% if form.instance.pk %}{% include "cms/includes/form_field.html" with field=form.DELETE %}{% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% if can_change_core %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Core Features</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "why-choose-items" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Trust Section</p>
+                <h2 class="mt-2 text-2xl font-black text-slate-900">Why Choose Us Items</h2>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ why_choose_formset.total_form_count }} items</span>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="why_choose">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            {{ why_choose_formset.management_form }}
+            <div class="space-y-4">
+                {% for form in why_choose_formset %}
+                <article class="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                    {{ form.id }}
+                    <div class="grid gap-4">
+                        {% include "cms/includes/form_field.html" with field=form.order %}
+                        {% include "cms/includes/form_field.html" with field=form.icon_class %}
+                        {% include "cms/includes/form_field.html" with field=form.title %}
+                        {% include "cms/includes/form_field.html" with field=form.description %}
+                        {% include "cms/includes/form_field.html" with field=form.metric %}
+                        {% if form.instance.pk %}{% include "cms/includes/form_field.html" with field=form.DELETE %}{% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% if can_change_why_choose %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Why Choose Items</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "navigation" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Menus</p>
+                <h2 class="mt-2 text-2xl font-black text-slate-900">Navigation</h2>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ nav_formset.total_form_count }} links</span>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="nav">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            {{ nav_formset.management_form }}
+            <div class="space-y-4">
+                {% for form in nav_formset %}
+                <article class="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                    {{ form.id }}
+                    <div class="grid gap-4 md:grid-cols-2">
+                        {% include "cms/includes/form_field.html" with field=form.label %}
+                        {% include "cms/includes/form_field.html" with field=form.url %}
+                        {% include "cms/includes/form_field.html" with field=form.order %}
+                        {% include "cms/includes/form_field.html" with field=form.is_active %}
+                        {% include "cms/includes/form_field.html" with field=form.show_in_header %}
+                        {% include "cms/includes/form_field.html" with field=form.show_in_mobile %}
+                        {% if form.instance.pk %}{% include "cms/includes/form_field.html" with field=form.DELETE %}{% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% if can_change_nav %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Navigation</button>{% endif %}
+        </form>
+    </article>
+    {% elif cms_subsection == "social-links" %}
+    <article class="rounded-[32px] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Channel Links</p>
+                <h2 class="mt-2 text-2xl font-black text-slate-900">Social Links</h2>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ social_formset.total_form_count }} links</span>
+        </div>
+        <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="social">
+            <input type="hidden" name="panel" value="{{ cms_subsection }}">
+            {{ social_formset.management_form }}
+            <div class="grid gap-4 lg:grid-cols-2">
+                {% for form in social_formset %}
+                <article class="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                    {{ form.id }}
+                    <div class="grid gap-4 md:grid-cols-2">
+                        {% include "cms/includes/form_field.html" with field=form.label %}
+                        {% include "cms/includes/form_field.html" with field=form.icon_class %}
+                        <div class="md:col-span-2">{% include "cms/includes/form_field.html" with field=form.url %}</div>
+                        {% include "cms/includes/form_field.html" with field=form.location %}
+                        {% include "cms/includes/form_field.html" with field=form.order %}
+                        {% include "cms/includes/form_field.html" with field=form.is_active %}
+                        {% if form.instance.pk %}{% include "cms/includes/form_field.html" with field=form.DELETE %}{% endif %}
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% if can_change_social %}<button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">Save Social Links</button>{% endif %}
+        </form>
+    </article>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% include "cms/includes/editorjs_assets.html" %}
+{% if cms_subsection == "site" %}
+<script>
+    window.initCmsEditors({
+        formId: "siteSettingsForm",
+        uploadUrl: "{% url 'cms:editorjs_image_upload' %}",
+        editors: [
+            {
+                inputId: "id_site-contact_auto_reply_message_json",
+                holderId: "siteReplyEditor",
+                placeholder: "Write the reusable contact auto-reply body here.",
+            }
+        ]
+    });
+</script>
+{% endif %}
+{% endblock %}

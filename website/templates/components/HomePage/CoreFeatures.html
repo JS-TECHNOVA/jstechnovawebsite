@@ -1,0 +1,72 @@
+﻿<!-- Core Features -->
+<section class="section-space relative overflow-hidden bg-[linear-gradient(180deg,#f7fbff_0%,#eef4fc_100%)]">
+    <div class="pointer-events-none absolute inset-0">
+        <div
+            class="absolute inset-0 opacity-35 [background-size:120px_120px] [background-image:linear-gradient(rgba(3,22,58,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(3,22,58,0.06)_1px,transparent_1px)]">
+        </div>
+        <div class="absolute -right-14 -top-10 h-64 w-64 rounded-full bg-secondary/15 blur-3xl"></div>
+    </div>
+    <div class="container relative z-10 px-6" data-aos="fade-up">
+        <div class="grid grid-cols-1 gap-8 xl:gap-8 lg:grid-cols-12 lg:items-start">
+            <div class="lg:col-span-8">
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    {% for feature in core_features %}
+                        <article data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00"
+                            class="group flex min-h-[220px] cursor-pointer items-start gap-5 rounded-2xl bg-slate-200/90 px-6 py-7 text-dark transition-all duration-300 hover:bg-secondary hover:text-white active:bg-secondary md:px-7">
+                            <span
+                                class="grid h-16 w-16 shrink-0 place-items-center border border-slate-500/70 text-2xl text-slate-600 transition-colors duration-300 group-hover:border-white/60 group-hover:text-white rounded-2xl">
+                                <i class="{{ feature.icon_class }}"></i>
+                            </span>
+                            <div>
+                                <h3 class="text-xl md:text-2xl font-semibold">{{ feature.title }}</h3>
+                                <p
+                                    class="mt-3 text-sm leading-7 text-slate-700 transition-colors duration-300 group-hover:text-white/90 md:text-base">
+                                    {{ feature.description }}
+                                </p>
+                                <a href="{{ feature.cta_url }}"
+                                    class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-secondary transition-colors duration-300 group-hover:text-white md:text-base">
+                                    {{ feature.cta_text }}
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="lg:col-span-4" data-aos="fade-left" data-aos-delay="140">
+                <p
+                    class="inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
+                    <span>&bull;</span>
+                    {{ homepage_content.core_badge }}
+                    <span>&bull;</span>
+                </p>
+
+                <h2 class="sub-heading">
+                    {{ homepage_content.core_title }}
+                </h2>
+
+                <p class="section-copy mt-6 max-w-md text-slate-700">
+                    {{ homepage_content.core_description }}
+                </p>
+
+                <a href="{{ homepage_content.core_cta_url }}" class="group/button mt-4 inline-block relative w-40 h-12 cursor-pointer">
+                    <div
+                        class="relative flex items-center justify-between  h-full w-full rounded-full  bg-white border border-gray-300  shadow-sm overflow-hidden transition-all duration-300  hover:shadow-md">
+                        <div
+                            class="absolute left-1 top-1 bottom-1 w-10 group-hover/button:w-[calc(100%-0.5rem)] bg-indigo-600 rounded-full transition-all duration-500 ease-in-out flex items-center justify-center">
+                            <i class="fa-solid fa-arrow-right text-white text-sm"></i>
+                        </div>
+                        <span
+                            class="ml-14 text-sm font-medium text-gray-700 group-hover/button:text-white transition-colors duration-300">
+                            {{ homepage_content.core_cta_text }}
+                        </span>
+                    </div>
+                </a>
+
+
+            </div>
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,92 @@
+﻿<section class="section-space relative overflow-hidden bg-dark">
+    <div class="pointer-events-none absolute inset-0">
+        <div
+            class="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(25,107,255,0.2),transparent_38%),linear-gradient(180deg,#03163a_0%,#02112d_100%)]">
+        </div>
+        <div
+            class="absolute inset-0 opacity-15 [background-size:140px_140px] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)]">
+        </div>
+    </div>
+
+    <div class="container relative z-10 px-6">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end" data-aos="fade-up">
+            <div class="lg:col-span-8">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
+                    {{ homepage_content.projects_badge }}
+                </p>
+                <h2 class="section-title mt-4 max-w-[18ch] text-white">
+                    {{ homepage_content.projects_title }}
+                </h2>
+            </div>
+
+            <div class="lg:col-span-4 lg:text-right">
+                <a href="{{ homepage_content.projects_button_url }}" class="group/button inline-block relative w-48 h-14 cursor-pointer">
+                    <div
+                        class="relative flex h-full w-full items-center justify-between overflow-hidden rounded-full border border-gray-300 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                        <div
+                            class="absolute left-1 top-1 bottom-1 w-12 rounded-full bg-indigo-600 transition-all duration-500 ease-in-out flex items-center justify-center group-hover/button:w-[calc(100%-0.5rem)]">
+                            <i class="fa-solid fa-arrow-right text-white text-sm"></i>
+                        </div>
+                        <span
+                            class="ml-17 text-base font-semibold text-gray-800 transition-colors duration-300 group-hover/button:text-white">
+                            {{ homepage_content.projects_button_text }}
+                        </span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-12 hidden h-[560px] gap-4 md:flex" data-aos="zoom-in-up" data-aos-delay="120">
+            {% for item in home_projects %}
+                <article
+                    class="group/panel relative min-w-[90px] flex-[0.9] overflow-hidden transition-[flex] duration-500 ease-out hover:flex-[4]">
+                    <img src="{{ item.project.image_url }}" alt="{{ item.project.title }}" class="h-full w-full object-cover" />
+                    <div
+                        class="absolute inset-0 bg-[#03163a]/55 transition-colors duration-300 group-hover/panel:bg-[#03163a]/30">
+                    </div>
+                    <h3
+                        class="absolute bottom-8 left-1/2 -translate-x-1/2 rotate-180 text-xl font-semibold tracking-wide text-white [writing-mode:vertical-rl] transition-opacity duration-300 group-hover/panel:opacity-0">
+                        {{ item.project.vertical_label }}
+                    </h3>
+                    <div
+                        class="absolute inset-x-0 bottom-0 translate-y-5 p-6 opacity-0 transition-all duration-300 group-hover/panel:translate-y-0 group-hover/panel:opacity-100">
+                        <h4 class="max-w-[16ch] text-3xl font-bold leading-[1.2] text-white md:text-4xl">
+                            {{ item.project.title }}
+                        </h4>
+                        <p class="mt-2 text-sm text-white/85">{{ item.project.summary }}</p>
+                        <div class="mt-4 flex gap-2">
+                            {% if item.project.tag_one %}
+                                <span class="rounded-full bg-white/20 px-3 py-1 text-xs text-white">{{ item.project.tag_one }}</span>
+                            {% endif %}
+                            {% if item.project.tag_two %}
+                                <span class="rounded-full bg-white/20 px-3 py-1 text-xs text-white">{{ item.project.tag_two }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{{ item.project.get_absolute_url }}" class="absolute inset-0" aria-label="{{ item.project.title }}"></a>
+                </article>
+            {% empty %}
+                <article class="flex h-full w-full items-center justify-center rounded-2xl border border-white/20 bg-white/5 p-6 text-white/80">
+                    Add published projects and map them in HomeProject.
+                </article>
+            {% endfor %}
+        </div>
+
+        <div class="mt-10 grid gap-4 md:hidden">
+            {% for item in home_projects %}
+                <article class="relative overflow-hidden rounded-xl bg-[#17345e]/70">
+                    <img src="{{ item.project.image_url }}" alt="{{ item.project.title }}" class="h-52 w-full object-cover" />
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold text-white">{{ item.project.vertical_label }}</h3>
+                    </div>
+                    <a href="{{ item.project.get_absolute_url }}" class="absolute inset-0" aria-label="{{ item.project.title }}"></a>
+                </article>
+            {% empty %}
+                <article class="overflow-hidden rounded-xl bg-[#17345e]/70 p-5 text-white/80">
+                    Add published projects and map them in HomeProject.
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+

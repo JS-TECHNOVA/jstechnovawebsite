@@ -1,0 +1,167 @@
+﻿{% extends "cms/base.html" %}
+
+{% block title %}Homepage | CMS{% endblock %}
+
+{% block cms_content %}
+<section>
+    <h1 class="text-3xl font-bold text-slate-900">Homepage Manager</h1>
+    <p class="mt-2 text-slate-600">Control topbar/header/footer settings, hero, features, menu, and socials.</p>
+
+    <div class="mt-6 grid gap-6 xl:grid-cols-2">
+        <article class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="text-xl font-bold text-slate-900">Site Settings (Header/Footer/Topbar)</h2>
+            <form method="post" class="mt-5 space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="site">
+                {% for field in site_form %}
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>{% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-neutral">Save Site Settings</button>
+            </form>
+        </article>
+
+        <article class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="text-xl font-bold text-slate-900">Homepage Section Texts</h2>
+            <form method="post" class="mt-5 space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="home">
+                {% for field in homepage_form %}
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>{% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-neutral">Save Homepage Content</button>
+            </form>
+        </article>
+    </div>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Hero Slides</h2>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="hero">
+            {{ hero_formset.management_form }}
+            {% if hero_formset.non_form_errors %}<p class="text-sm text-red-600">{{ hero_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>Order</th><th>Image URL</th><th>Badge</th><th>Title</th><th>Description</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in hero_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.order }}</td>
+                                <td>{{ form.image_url }}</td>
+                                <td>{{ form.badge }}</td>
+                                <td>{{ form.title }}</td>
+                                <td>{{ form.description }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Hero Slides</button>
+        </form>
+    </article>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Core Features</h2>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="core">
+            {{ core_formset.management_form }}
+            {% if core_formset.non_form_errors %}<p class="text-sm text-red-600">{{ core_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>Order</th><th>Icon</th><th>Title</th><th>Description</th><th>CTA Text</th><th>CTA URL</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in core_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.order }}</td>
+                                <td>{{ form.icon_class }}</td>
+                                <td>{{ form.title }}</td>
+                                <td>{{ form.description }}</td>
+                                <td>{{ form.cta_text }}</td>
+                                <td>{{ form.cta_url }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Core Features</button>
+        </form>
+    </article>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Navigation Menu</h2>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="nav">
+            {{ nav_formset.management_form }}
+            {% if nav_formset.non_form_errors %}<p class="text-sm text-red-600">{{ nav_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>Label</th><th>URL</th><th>Order</th><th>Active</th><th>Header</th><th>Mobile</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in nav_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.label }}</td>
+                                <td>{{ form.url }}</td>
+                                <td>{{ form.order }}</td>
+                                <td>{{ form.is_active }}</td>
+                                <td>{{ form.show_in_header }}</td>
+                                <td>{{ form.show_in_mobile }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Navigation</button>
+        </form>
+    </article>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Social Links</h2>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="social">
+            {{ social_formset.management_form }}
+            {% if social_formset.non_form_errors %}<p class="text-sm text-red-600">{{ social_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>Label</th><th>Icon Class</th><th>URL</th><th>Location</th><th>Order</th><th>Active</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in social_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.label }}</td>
+                                <td>{{ form.icon_class }}</td>
+                                <td>{{ form.url }}</td>
+                                <td>{{ form.location }}</td>
+                                <td>{{ form.order }}</td>
+                                <td>{{ form.is_active }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Social Links</button>
+        </form>
+    </article>
+</section>
+{% endblock %}

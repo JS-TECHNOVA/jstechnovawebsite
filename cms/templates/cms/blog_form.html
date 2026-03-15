@@ -1,0 +1,232 @@
+﻿{% extends "cms/base.html" %}
+
+{% block title %}<title>{% if mode == 'edit' %}Edit Blog{% else %}New Blog{% endif %} | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="max-w-5xl">
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">{% if mode == 'edit' %}Edit Blog{% else %}Create Blog{% endif %}</h1>
+            <p class="mt-2 text-slate-600">Write blog content using Editor.js, manage taxonomy and scheduling, and attach reusable media assets.</p>
+        </div>
+        <a href="{% url 'cms:blogs_manage' %}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">Back to blogs</a>
+    </div>
+
+    <form method="post" id="blogEditorForm" class="space-y-6 rounded-[32px] bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        {% csrf_token %}
+
+        <div class="grid gap-4 md:grid-cols-2">
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                {{ form.title }}
+                {% if form.title.errors %}<p class="mt-1 text-sm text-red-600">{{ form.title.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
+                {{ form.slug }}
+                {% if form.slug.errors %}<p class="mt-1 text-sm text-red-600">{{ form.slug.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+                {{ form.category }}
+                {% if form.category.errors %}<p class="mt-1 text-sm text-red-600">{{ form.category.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                {{ form.status }}
+                {% if form.status.errors %}<p class="mt-1 text-sm text-red-600">{{ form.status.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.image_url.id_for_label }}">{{ form.image_url.label }}</label>
+                {{ form.image_url }}
+                {% if form.image_url.errors %}<p class="mt-1 text-sm text-red-600">{{ form.image_url.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.scheduled_for.id_for_label }}">{{ form.scheduled_for.label }}</label>
+                {{ form.scheduled_for }}
+                {% if form.scheduled_for.errors %}<p class="mt-1 text-sm text-red-600">{{ form.scheduled_for.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.published_on.id_for_label }}">{{ form.published_on.label }}</label>
+                {{ form.published_on }}
+                {% if form.published_on.errors %}<p class="mt-1 text-sm text-red-600">{{ form.published_on.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.comment_count.id_for_label }}">{{ form.comment_count.label }}</label>
+                {{ form.comment_count }}
+                {% if form.comment_count.errors %}<p class="mt-1 text-sm text-red-600">{{ form.comment_count.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.excerpt.id_for_label }}">{{ form.excerpt.label }}</label>
+                {{ form.excerpt }}
+                {% if form.excerpt.errors %}<p class="mt-1 text-sm text-red-600">{{ form.excerpt.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.tag_names.id_for_label }}">{{ form.tag_names.label }}</label>
+                {{ form.tag_names }}
+                {% if form.tag_names.help_text %}<p class="mt-1 text-xs text-slate-500">{{ form.tag_names.help_text }}</p>{% endif %}
+                {% if form.tag_names.errors %}<p class="mt-1 text-sm text-red-600">{{ form.tag_names.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.details_url.id_for_label }}">{{ form.details_url.label }}</label>
+                {{ form.details_url }}
+                <p class="mt-1 text-xs text-slate-500">Keep as `#` to use internal blog detail URL automatically.</p>
+                {% if form.details_url.errors %}<p class="mt-1 text-sm text-red-600">{{ form.details_url.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.related_posts.id_for_label }}">{{ form.related_posts.label }}</label>
+                {{ form.related_posts }}
+                {% if form.related_posts.errors %}<p class="mt-1 text-sm text-red-600">{{ form.related_posts.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.attachment_assets.id_for_label }}">{{ form.attachment_assets.label }}</label>
+                {{ form.attachment_assets }}
+                {% if form.attachment_assets.errors %}<p class="mt-1 text-sm text-red-600">{{ form.attachment_assets.errors|join:", " }}</p>{% endif %}
+            </div>
+        </div>
+
+        <section class="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+            <div class="mb-4 flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Media Library</p>
+                    <h2 class="mt-2 text-xl font-black text-slate-900">Upload Files</h2>
+                    <p class="mt-2 text-sm text-slate-600">Upload PDFs or Office files, then attach them to this post and link them from the article body.</p>
+                </div>
+                <label class="inline-flex cursor-pointer items-center justify-center rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+                    Upload file
+                    <input id="blogAssetUpload" type="file" class="hidden" accept=".pdf,.docx,.xlsx,.pptx" />
+                </label>
+            </div>
+            <div id="blogAssetUploadFeedback" class="hidden rounded-2xl border px-4 py-3 text-sm"></div>
+            <div id="blogAssetUploadList" class="mt-4 space-y-2"></div>
+        </section>
+
+        {% if mode == 'edit' %}
+            <section class="rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-5">
+                <div class="grid gap-4 md:grid-cols-4">
+                    <div class="rounded-2xl bg-white p-4 shadow-sm">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Views</p>
+                        <p class="mt-2 text-2xl font-black text-slate-900">{{ blog.view_count }}</p>
+                    </div>
+                    <div class="rounded-2xl bg-white p-4 shadow-sm">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Likes</p>
+                        <p class="mt-2 text-2xl font-black text-slate-900">{{ blog.like_count }}</p>
+                    </div>
+                    <div class="rounded-2xl bg-white p-4 shadow-sm">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Shares</p>
+                        <p class="mt-2 text-2xl font-black text-slate-900">{{ blog.share_count }}</p>
+                    </div>
+                    <div class="rounded-2xl bg-white p-4 shadow-sm">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Avg Read Time</p>
+                        <p class="mt-2 text-2xl font-black text-slate-900">{{ blog.average_read_time_seconds }}s</p>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-5">
+            <div class="mb-4 flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-600">Search Metadata</p>
+                    <h2 class="mt-2 text-xl font-black text-slate-900">Blog SEO</h2>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Meta / OG / Schema</span>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in form %}
+                    {% if field.name in seo_field_names %}
+                        <div class="{% if field.name == 'seo_meta_description' or field.name == 'seo_og_description' or field.name == 'seo_schema_json_ld' %}md:col-span-2{% endif %}">
+                            {% include "cms/includes/form_field.html" with field=field %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        {{ form.content_json }}
+        {% if form.content_json.errors %}<p class="mt-1 text-sm text-red-600">{{ form.content_json.errors|join:", " }}</p>{% endif %}
+
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-700">Blog Content (Editor.js)</label>
+            <div id="editorjs" class="min-h-[320px] rounded-lg border border-slate-300 bg-white p-4"></div>
+        </div>
+
+        <button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">{% if mode == 'edit' %}Update Blog{% else %}Create Blog{% endif %}</button>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% include "cms/includes/editorjs_assets.html" %}
+<script>
+(function () {
+    window.initCmsEditors({
+        formId: "blogEditorForm",
+        uploadUrl: "{% url 'cms:editorjs_image_upload' %}",
+        editors: [
+            {
+                holderId: "editorjs",
+                inputId: "{{ form.content_json.id_for_label }}",
+                placeholder: "Write the article body here...",
+            },
+        ],
+    });
+
+    const uploadInput = document.getElementById("blogAssetUpload");
+    const uploadList = document.getElementById("blogAssetUploadList");
+    const feedback = document.getElementById("blogAssetUploadFeedback");
+    const attachmentSelect = document.getElementById("{{ form.attachment_assets.id_for_label }}");
+
+    if (uploadInput && uploadList && feedback && attachmentSelect) {
+        uploadInput.addEventListener("change", async function () {
+            const file = uploadInput.files && uploadInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            feedback.className = "rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600";
+            feedback.textContent = "Uploading file...";
+            feedback.classList.remove("hidden");
+
+            try {
+                const csrfToken = document.cookie
+                    .split("; ")
+                    .find((item) => item.startsWith("csrftoken="))
+                    ?.split("=")[1] || "";
+
+                const response = await fetch("{% url 'cms:media_asset_upload' %}", {
+                    method: "POST",
+                    body: formData,
+                    headers: { "X-CSRFToken": csrfToken },
+                    credentials: "same-origin",
+                });
+                const payload = await response.json();
+                if (!response.ok || !payload.success) {
+                    throw new Error(payload.message || "Upload failed.");
+                }
+
+                const option = document.createElement("option");
+                option.value = payload.asset.id;
+                option.textContent = payload.asset.title || payload.asset.original_name || "Uploaded file";
+                option.selected = true;
+                attachmentSelect.appendChild(option);
+
+                const item = document.createElement("div");
+                item.className = "rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700";
+                item.innerHTML = "<span class='font-semibold'>Uploaded:</span> " + (payload.asset.title || payload.asset.original_name || "Uploaded file") + "<br><span class='text-slate-500'>" + payload.file.url + "</span>";
+                uploadList.prepend(item);
+
+                feedback.className = "rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700";
+                feedback.textContent = "File uploaded and attached to this post.";
+                uploadInput.value = "";
+            } catch (error) {
+                feedback.className = "rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700";
+                feedback.textContent = error.message || "Upload failed.";
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

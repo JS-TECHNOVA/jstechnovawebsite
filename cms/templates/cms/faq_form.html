@@ -1,0 +1,44 @@
+{% extends "cms/base.html" %}
+
+{% block title %}<title>{% if mode == 'edit' %}Edit FAQ{% else %}New FAQ{% endif %} | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="max-w-5xl">
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">{% if mode == 'edit' %}Edit FAQ{% else %}Create FAQ{% endif %}</h1>
+            <p class="mt-2 text-slate-600">Add frequently asked questions for homepage accordion.</p>
+        </div>
+        <a href="{% url 'cms:faqs_manage' %}" class="btn btn-outline">Back to FAQs</a>
+    </div>
+
+    <form method="post" class="space-y-5 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        {% csrf_token %}
+
+        <div class="grid gap-4 md:grid-cols-2">
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
+                {{ form.order }}
+                {% if form.order.errors %}<p class="mt-1 text-sm text-red-600">{{ form.order.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700">{{ form.is_published.label }}</label>
+                {{ form.is_published }}
+                {% if form.is_published.errors %}<p class="mt-1 text-sm text-red-600">{{ form.is_published.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.question.id_for_label }}">{{ form.question.label }}</label>
+                {{ form.question }}
+                {% if form.question.errors %}<p class="mt-1 text-sm text-red-600">{{ form.question.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.answer.id_for_label }}">{{ form.answer.label }}</label>
+                {{ form.answer }}
+                {% if form.answer.errors %}<p class="mt-1 text-sm text-red-600">{{ form.answer.errors|join:", " }}</p>{% endif %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-neutral">{% if mode == 'edit' %}Update FAQ{% else %}Create FAQ{% endif %}</button>
+    </form>
+</section>
+{% endblock %}

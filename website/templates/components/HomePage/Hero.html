@@ -1,0 +1,87 @@
+<section class="relative w-full overflow-hidden">
+    <!-- Slider -->
+    <div id="hero" class="relative h-[520px] md:h-[640px]">
+        <!-- Slides -->
+        <div class="absolute inset-0">
+            {% for slide in hero_slides %}
+                <div class="hero-slide absolute inset-0 {% if forloop.first %}opacity-100{% else %}opacity-0{% endif %} transition-opacity duration-1000 ease-in-out"
+                    data-img="{{ slide.image_url }}">
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Background overlay (left dark fade like screenshot) -->
+        <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/10">
+        </div>
+
+        <!-- Content -->
+        <div class="relative mx-auto flex h-full container items-center px-6">
+            <div class="grid w-full grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                <!-- LEFT CONTENT (animated) -->
+                <div class="max-w-xl text-white">
+                    <span id="heroBadge" class="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-xs font-semibold tracking-wider ring-1 ring-white/15">
+                        {{ hero_first_slide.badge }}
+                    </span>
+
+                    <h1 id="heroTitle" class="mt-6 heading">
+                        {{ hero_first_slide.title }}
+                    </h1>
+
+                    <p id="heroDesc" class="mt-6 text-white/80 text-base md:text-lg">
+                        {{ hero_first_slide.description }}
+                    </p>
+
+                    <div id="heroCta" class="mt-10">
+                        <a href="{{ homepage_content.hero_cta_url }}" class="group/button inline-block relative w-40 md:w-56 h-12 md:h-16 cursor-pointer">
+                            <div
+                                class="relative flex items-center justify-between  h-full w-full rounded-full  bg-white border border-gray-300  shadow-sm overflow-hidden transition-all duration-300  hover:shadow-md">
+                                <div
+                                    class="absolute left-1 top-1 bottom-1 w-10 md:w-14 group-hover/button:w-[calc(100%-0.5rem)] bg-indigo-600 rounded-full transition-all duration-500 ease-in-out flex items-center justify-center">
+                                    <i class="fa-solid fa-arrow-right text-white text-sm"></i>
+                                </div>
+                                <span
+                                    class="ml-13 md:ml-20 text-sm md:text-lg font-medium text-gray-700 group-hover/button:text-white transition-colors duration-300">
+                                    {{ homepage_content.hero_cta_text }}
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- RIGHT "card" like screenshot -->
+                <div class="hidden lg:flex justify-end">
+                    <div
+                        class="relative w-[420px] rounded-2xl bg-white/10 p-8 text-white ring-1 ring-white/15 backdrop-blur">
+                        <div class="flex items-center gap-3">
+                            <span class="grid h-12 w-12 place-items-center rounded-xl bg-white/10 ring-1 ring-white/15">
+                                <i class="fa-solid fa-award text-xl"></i>
+                            </span>
+                            <div>
+                                <p class="text-sm font-semibold text-white/90">{{ homepage_content.hero_right_title }}</p>
+                                <p class="text-xs text-white/70">{{ homepage_content.hero_right_subtitle }}</p>
+                            </div>
+                        </div>
+
+                        <p class="mt-6 text-white/85 leading-relaxed">
+                            {{ homepage_content.hero_right_description }}
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <button id="prevBtn" class="hidden absolute left-4 top-1/2 -translate-y-1/2 xl:grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white
+                 ring-1 ring-white/15 hover:bg-white/20 transition">
+            <i class="fa fa-chevron-left"></i>
+        </button>
+        <button id="nextBtn" class="hidden absolute right-4 top-1/2 -translate-y-1/2 xl:grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white
+                 ring-1 ring-white/15 hover:bg-white/20 transition">
+            <i class="fa fa-chevron-right"></i>
+        </button>
+
+        <!-- Dots -->
+        <div id="dots" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2"></div>
+    </div>
+</section>

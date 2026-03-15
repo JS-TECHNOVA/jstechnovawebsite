@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}<title>CMS | JSTechnova</title>{% endblock %}
+
+{% block body_class %}h-screen overflow-hidden bg-[#eef4ff] text-slate-900{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="h-screen overflow-hidden lg:grid lg:grid-cols-[320px_1fr]">
+    <aside class="relative h-screen overflow-y-auto bg-[#03163a] px-5 py-6 text-white">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.35),transparent_28%),linear-gradient(180deg,#03163a_0%,#041b45_50%,#02112c_100%)]"></div>
+        <div class="relative z-10">
+            <a href="{% url 'cms:dashboard' %}" class="relative block overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(135deg,#03163a_0%,#0d2457_60%,#1657db_100%)] px-5 py-5 text-white shadow-[0_30px_80px_rgba(3,22,58,0.28)]">
+                <div class="absolute -right-14 -top-20 h-60 w-60 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.24)_0%,rgba(255,255,255,0)_72%)]"></div>
+                <div class="absolute -bottom-44 -left-24 h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.36)_0%,rgba(59,130,246,0)_70%)]"></div>
+                <div class="relative z-10">
+                    <p class="text-xs font-semibold uppercase tracking-[0.28em] text-blue-100/85">Control Center</p>
+                    <h1 class="mt-3 text-2xl font-black tracking-tight">JSTechnova CMS</h1>
+                    <p class="mt-3 max-w-[20ch] text-sm leading-6 text-blue-50/78">Manage content, featured sections, and incoming leads from one place.</p>
+                </div>
+            </a>
+
+            <nav class="mt-6 space-y-2">
+                <a href="{% url 'cms:dashboard' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'dashboard' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-solid fa-chart-line"></i></span>
+                    <span class="font-semibold">Dashboard</span>
+                </a>
+                {% if perms.website.view_sitesettings or perms.website.view_homepagecontent or perms.website.view_heroslide or perms.website.view_corefeature or perms.website.view_whychooseusitem or perms.website.view_navigationitem or perms.website.view_sociallink %}
+                <details class="group" {% if cms_section == 'homepage_manage' %}open{% endif %}>
+                    <summary class="flex cursor-pointer list-none items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'homepage_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                        <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-solid fa-house"></i></span>
+                        <span class="font-semibold">Homepage</span>
+                        <span class="ml-auto transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+                    </summary>
+                    <div class="mt-2 space-y-2 pl-4">
+                        {% if perms.website.view_sitesettings %}<a href="{% url 'cms:homepage_manage' %}?panel=site" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'site' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Site Settings</a>{% endif %}
+                        {% if perms.website.view_homepagecontent %}<a href="{% url 'cms:homepage_manage' %}?panel=hero-copy" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'hero-copy' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Hero Copy</a>{% endif %}
+                        {% if perms.website.view_homepagecontent %}<a href="{% url 'cms:homepage_manage' %}?panel=why-choose-copy" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'why-choose-copy' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Why Choose Copy</a>{% endif %}
+                        {% if perms.website.view_homepagecontent %}<a href="{% url 'cms:homepage_manage' %}?panel=featured" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'featured' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Featured Sections</a>{% endif %}
+                        {% if perms.website.view_homepagecontent %}<a href="{% url 'cms:homepage_manage' %}?panel=final-cta" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'final-cta' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Final CTA</a>{% endif %}
+                        {% if perms.website.view_homepagecontent %}<a href="{% url 'cms:homepage_manage' %}?panel=seo" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'seo' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Homepage SEO</a>{% endif %}
+                        {% if perms.website.view_heroslide %}<a href="{% url 'cms:homepage_manage' %}?panel=hero-slides" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'hero-slides' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Hero Slides</a>{% endif %}
+                        {% if perms.website.view_corefeature %}<a href="{% url 'cms:homepage_manage' %}?panel=core-features" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'core-features' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Core Features</a>{% endif %}
+                        {% if perms.website.view_whychooseusitem %}<a href="{% url 'cms:homepage_manage' %}?panel=why-choose-items" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'why-choose-items' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Why Choose Items</a>{% endif %}
+                        {% if perms.website.view_navigationitem %}<a href="{% url 'cms:homepage_manage' %}?panel=navigation" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'navigation' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Navigation</a>{% endif %}
+                        {% if perms.website.view_sociallink %}<a href="{% url 'cms:homepage_manage' %}?panel=social-links" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'homepage_manage' and cms_subsection == 'social-links' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Social Links</a>{% endif %}
+                    </div>
+                </details>
+                {% endif %}
+                {% if perms.website.view_aboutpagecontent or perms.website.view_contactpagecontent or perms.website.view_aboutvalue or perms.website.view_aboutprocessstep %}
+                <details class="group" {% if cms_section == 'pages_manage' %}open{% endif %}>
+                    <summary class="flex cursor-pointer list-none items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'pages_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                        <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-regular fa-file-lines"></i></span>
+                        <span class="font-semibold">Pages</span>
+                        <span class="ml-auto transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
+                    </summary>
+                    <div class="mt-2 space-y-2 pl-4">
+                        {% if perms.website.view_aboutpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=about-hero" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'about-hero' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">About Hero</a>{% endif %}
+                        {% if perms.website.view_aboutpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=about-story" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'about-story' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">About Story</a>{% endif %}
+                        {% if perms.website.view_aboutpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=about-company" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'about-company' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">About Company</a>{% endif %}
+                        {% if perms.website.view_aboutpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=about-mission" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'about-mission' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Mission & Vision</a>{% endif %}
+                        {% if perms.website.view_aboutpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=about-headings" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'about-headings' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Values & Process</a>{% endif %}
+                        {% if perms.website.view_aboutpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=about-seo" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'about-seo' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">About SEO</a>{% endif %}
+                        {% if perms.website.view_aboutvalue %}<a href="{% url 'cms:pages_manage' %}?panel=about-values" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'about-values' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">About Values</a>{% endif %}
+                        {% if perms.website.view_aboutprocessstep %}<a href="{% url 'cms:pages_manage' %}?panel=about-steps" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'about-steps' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">About Steps</a>{% endif %}
+                        {% if perms.website.view_contactpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=contact-hero" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'contact-hero' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Contact Hero</a>{% endif %}
+                        {% if perms.website.view_contactpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=contact-form" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'contact-form' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Contact Form Copy</a>{% endif %}
+                        {% if perms.website.view_contactpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=contact-office" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'contact-office' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Contact Office</a>{% endif %}
+                        {% if perms.website.view_contactpagecontent %}<a href="{% url 'cms:pages_manage' %}?panel=contact-seo" class="block rounded-[18px] border px-4 py-3 text-sm font-medium transition {% if cms_section == 'pages_manage' and cms_subsection == 'contact-seo' %}border-blue-200/20 bg-white/12 text-white{% else %}border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.08] hover:text-white{% endif %}">Contact SEO</a>{% endif %}
+                    </div>
+                </details>
+                {% endif %}
+                {% if perms.website.view_contactsubmission %}
+                <a href="{% url 'cms:contact_submissions_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'contact_submissions_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-regular fa-envelope-open"></i></span>
+                    <span class="font-semibold">Contact Inbox</span>
+                </a>
+                {% endif %}
+                {% if perms.website.view_mediaasset %}
+                <a href="{% url 'cms:media_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'media_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-regular fa-images"></i></span>
+                    <span class="font-semibold">Media Library</span>
+                </a>
+                {% endif %}
+                {% if perms.website.view_auditlog %}
+                <a href="{% url 'cms:audit_logs' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'audit_logs' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                    <span class="font-semibold">Audit Logs</span>
+                </a>
+                {% endif %}
+                {% if perms.website.view_service %}
+                <a href="{% url 'cms:services_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'services_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-solid fa-briefcase"></i></span>
+                    <span class="font-semibold">Services</span>
+                </a>
+                {% endif %}
+                {% if perms.website.view_project %}
+                <a href="{% url 'cms:projects_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'projects_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-solid fa-diagram-project"></i></span>
+                    <span class="font-semibold">Projects</span>
+                </a>
+                {% endif %}
+                {% if perms.website.view_blogpost %}
+                <a href="{% url 'cms:blogs_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'blogs_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-regular fa-newspaper"></i></span>
+                    <span class="font-semibold">Blogs</span>
+                </a>
+                {% endif %}
+                {% if perms.website.view_careeropening %}
+                <a href="{% url 'cms:careers_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'careers_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-solid fa-user-group"></i></span>
+                    <span class="font-semibold">Careers</span>
+                </a>
+                {% endif %}
+                {% if perms.website.view_testimonial %}
+                <a href="{% url 'cms:testimonials_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'testimonials_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-regular fa-comments"></i></span>
+                    <span class="font-semibold">Testimonials</span>
+                </a>
+                {% endif %}
+                {% if perms.website.view_faqitem %}
+                <a href="{% url 'cms:faqs_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'faqs_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-regular fa-circle-question"></i></span>
+                    <span class="font-semibold">FAQs</span>
+                </a>
+                {% endif %}
+                {% if perms.auth.view_user %}
+                <a href="{% url 'cms:users_manage' %}" class="group flex items-center gap-3 rounded-[22px] border px-4 py-4 transition duration-200 {% if cms_section == 'users_manage' %}border-blue-200/20 bg-[linear-gradient(135deg,rgba(37,99,235,0.38),rgba(255,255,255,0.14))] text-white shadow-[0_18px_40px_rgba(2,12,34,0.26)]{% else %}border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] text-slate-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white{% endif %}">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-solid fa-users-gear"></i></span>
+                    <span class="font-semibold">Users</span>
+                </a>
+                {% endif %}
+                <a href="{% url 'admin:index' %}" class="group flex items-center gap-3 rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-4 py-4 text-slate-200 transition duration-200 hover:-translate-y-px hover:border-white/15 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:text-white">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[18px] border border-white/10 bg-white/10"><i class="fa-solid fa-shield-halved"></i></span>
+                    <span class="font-semibold">Django Admin</span>
+                </a>
+            </nav>
+
+            <div class="mt-8 rounded-[28px] border border-slate-200/70 bg-white/95 px-4 py-4 text-slate-900 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Signed in as</p>
+                <p class="mt-2 text-base font-bold text-slate-900">{{ request.user.username }}</p>
+                <a href="{% url 'cms:logout' %}" class="btn btn-sm btn-outline mt-4">Logout</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="relative h-screen overflow-y-auto px-4 py-6 lg:px-8 xl:px-10">
+        <div class="pointer-events-none absolute inset-0">
+            <div class="absolute -left-12 top-8 h-44 w-44 rounded-full bg-blue-200/40 blur-3xl"></div>
+            <div class="absolute right-0 top-0 h-64 w-64 rounded-full bg-indigo-200/35 blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10">
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">JSTechnova Internal CMS</p>
+                    <p class="mt-2 text-sm text-slate-600">Content operations, lead capture, and featured-section control.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{% url 'home' %}" class="btn btn-sm btn-outline">Open Site</a>
+                </div>
+            </div>
+
+            {% if messages %}
+                <div class="mb-5 space-y-3">
+                    {% for message in messages %}
+                        <div class="rounded-[28px] border border-slate-200/70 bg-white/95 px-4 py-3 text-sm font-medium text-slate-700 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block cms_content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+<div id="cmsMediaPicker" data-library-url="{% url 'cms:media_library_data' %}" data-upload-url="{% url 'cms:media_asset_upload' %}" class="pointer-events-none fixed inset-0 z-[120] hidden">
+    <div data-media-picker-backdrop class="absolute inset-0 bg-[#03163a]/60 backdrop-blur-sm opacity-0 transition duration-200"></div>
+    <div class="absolute inset-x-4 top-6 mx-auto max-w-6xl translate-y-6 opacity-0 transition duration-200 md:inset-x-8" data-media-picker-panel>
+        <div class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_40px_120px_rgba(15,23,42,0.24)]">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 px-5 py-4 md:px-6">
+                <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Reusable Assets</p>
+                    <h2 class="mt-2 text-2xl font-black text-slate-900">Media Library</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'cms:media_manage' %}" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Open full library</a>
+                    <button type="button" data-media-picker-close class="grid h-11 w-11 place-items-center rounded-full border border-slate-300 text-slate-600 transition hover:bg-slate-50">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid gap-0 lg:grid-cols-[320px_minmax(0,1fr)]">
+                <aside class="border-b border-slate-200 bg-slate-50 px-5 py-5 lg:border-b-0 lg:border-r md:px-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700" for="mediaPickerSearch">Search</label>
+                            <input id="mediaPickerSearch" type="text" class="w-full rounded-[18px] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="Search media by name" />
+                        </div>
+                        <div>
+                            <p class="mb-2 text-sm font-semibold text-slate-700">Type</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button type="button" data-media-filter="all" class="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white">All</button>
+                                <button type="button" data-media-filter="image" class="rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">Images</button>
+                                <button type="button" data-media-filter="video" class="rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">Videos</button>
+                                <button type="button" data-media-filter="file" class="rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">Files</button>
+                            </div>
+                        </div>
+                        <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Upload New</p>
+                                    <h3 class="mt-2 text-lg font-black text-slate-900">Add media</h3>
+                                    <p class="mt-2 text-sm leading-6 text-slate-600">Upload images, videos, PDFs, or Office files and reuse them anywhere in the CMS.</p>
+                                </div>
+                            </div>
+                            <label class="mt-4 inline-flex cursor-pointer items-center justify-center rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+                                Choose file
+                                <input id="mediaPickerUploadInput" type="file" class="hidden" accept=".jpg,.jpeg,.png,.gif,.webp,.mp4,.m4v,.mov,.webm,.pdf,.docx,.xlsx,.pptx" />
+                            </label>
+                            <label class="mt-4 flex items-center gap-3 rounded-[18px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                                <input id="mediaPickerOptimize" type="checkbox" class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" checked />
+                                <span>Optimize images when possible</span>
+                            </label>
+                            <div id="mediaPickerUploadFeedback" class="mt-4 hidden rounded-[18px] border px-4 py-3 text-sm"></div>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="px-5 py-5 md:px-6">
+                    <div class="mb-4 flex items-center justify-between gap-4">
+                        <p id="mediaPickerTargetLabel" class="text-sm font-semibold text-slate-700">Select media for field</p>
+                        <p id="mediaPickerCount" class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">0 items</p>
+                    </div>
+                    <div id="mediaPickerGrid" class="grid max-h-[70vh] gap-4 overflow-y-auto pr-1 sm:grid-cols-2 xl:grid-cols-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'cms/js/media-library.js' %}"></script>
+{% endblock %}

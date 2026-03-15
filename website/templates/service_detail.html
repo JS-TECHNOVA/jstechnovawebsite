@@ -1,0 +1,61 @@
+﻿{% extends 'base.html' %}
+{% load editorjs %}
+
+{% block title %}<title>{{ seo.title }}</title>{% endblock %}
+
+{% block content %}
+    {% include 'components/TopBar.html' %}
+    {% include 'components/Header.html' %}
+
+    <section class="section-space bg-[linear-gradient(180deg,#f6f9ff_0%,#eef4fc_100%)]">
+        <div class="container px-6">
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
+                <article class="lg:col-span-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <img src="{{ service.image_url }}" alt="{{ service.title }}" class="h-[340px] w-full object-cover md:h-[460px]" />
+                    <div class="p-6 md:p-10">
+                        <div class="flex items-center gap-2 text-sm text-slate-600">
+                            <span class="rounded-full bg-brand-100 px-3 py-1 font-medium">Service</span>
+                        </div>
+
+                        <h1 class="mt-5 text-3xl font-extrabold leading-[1.15] text-dark md:text-5xl">{{ service.title }}</h1>
+                        <p class="mt-5 text-base leading-8 text-slate-600 md:text-lg">{{ service.summary }}</p>
+
+                        <div class="prose prose-slate mt-8 max-w-none">
+                            {{ service.content_json|render_editorjs }}
+                        </div>
+
+                        <a href="{% url 'services' %}" class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-dark hover:text-secondary">
+                            <i class="fa-solid fa-arrow-left text-xs"></i> Back to services
+                        </a>
+                    </div>
+                </article>
+
+                <aside class="lg:col-span-4 space-y-5">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-2xl font-bold text-dark">{{ service_page_content.detail_sidebar_title }}</h3>
+                        <div class="mt-5 space-y-4">
+                            {% for recent in recent_services %}
+                                <article class="flex gap-3">
+                                    <img src="{{ recent.image_url }}" alt="{{ recent.title }}" class="h-16 w-16 shrink-0 rounded object-cover" />
+                                    <div>
+                                        <a href="{{ recent.get_absolute_url }}" class="text-sm font-semibold leading-5 text-dark hover:text-secondary">{{ recent.title }}</a>
+                                    </div>
+                                </article>
+                            {% empty %}
+                                <p class="text-sm text-slate-600">No recent services.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    {% include 'components/Footer.html' %}
+
+    <div class="quick-actions" aria-label="Quick contact actions">
+        <a href="{{ site_settings.quick_action_email_url }}" class="quick-actions-item qa-email" aria-label="Email us"><i class="fa-solid fa-envelope"></i></a>
+        <a href="{{ site_settings.quick_action_whatsapp_url }}" class="quick-actions-item qa-whatsapp" aria-label="Chat on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="{{ site_settings.quick_action_contact_url }}" class="quick-actions-toggle" aria-label="Contact options"><i class="fa-solid fa-message"></i></a>
+    </div>
+{% endblock %}

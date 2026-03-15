@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load editorjs %}
+
+{% block title %}<title>{{ seo.title }}</title>{% endblock %}
+
+{% block content %}
+    {% include 'components/TopBar.html' %}
+    {% include 'components/Header.html' %}
+
+    <section class="section-space bg-[linear-gradient(180deg,#f5f8fd_0%,#edf3fb_100%)]">
+        <div class="container px-6">
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
+                <article class="lg:col-span-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <img src="{{ blog.image_url }}" alt="{{ blog.title }}" class="h-[340px] w-full object-cover md:h-[460px]" />
+                    <div class="p-6 md:p-10">
+                        <div class="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                            <span class="rounded-full bg-brand-100 px-3 py-1 font-medium">{{ blog.category }}</span>
+                            <span>•</span>
+                            <span>{{ blog.published_on|date:"F d, Y" }}</span>
+                            <span>•</span>
+                            <span>{{ blog.comment_count }} comments</span>
+                        </div>
+
+                        <h1 class="mt-5 text-3xl font-extrabold leading-[1.15] text-dark md:text-5xl">{{ blog.title }}</h1>
+                        <p class="mt-5 text-base leading-8 text-slate-600 md:text-lg">{{ blog.excerpt }}</p>
+
+                        {% if blog.tags.all %}
+                            <div class="mt-5 flex flex-wrap gap-2">
+                                {% for tag in blog.tags.all %}
+                                    <a href="{% url 'blogs' %}?tag={{ tag.slug|urlencode }}" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-200">#{{ tag.name }}</a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-6 flex flex-wrap items-center gap-3">
+                            <button id="blogLikeButton" class="inline-flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-dark transition hover:border-secondary hover:text-secondary">
+                                <i class="fa-regular fa-heart"></i>
+                                <span>Like</span>
+                                <span id="blogLikeCount">{{ blog.like_count }}</span>
+                            </button>
+                            <button id="blogShareButton" class="inline-flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-dark transition hover:border-secondary hover:text-secondary">
+                                <i class="fa-solid fa-share-nodes"></i>
+                                <span>Share</span>
+                                <span id="blogShareCount">{{ blog.share_count }}</span>
+                            </button>
+                            <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600">{{ blog.view_count }} views</span>
+                        </div>
+
+                        <div class="prose prose-slate mt-8 max-w-none">
+                            {{ blog.content_json|render_editorjs }}
+                        </div>
+
+                        {% if blog.attachment_assets.all %}
+                            <div class="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                                <h2 class="text-xl font-bold text-dark">Files and Attachments</h2>
+                                <div class="mt-4 space-y-3">
+                                    {% for asset in blog.attachment_assets.all %}
+                                        <a href="{{ asset.file_url }}" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-secondary hover:text-secondary">
+                                            <span>{{ asset.title|default:asset.original_name }}</span>
+                                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <a href="{% url 'blogs' %}" class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-dark hover:text-secondary">
+                            <i class="fa-solid fa-arrow-left text-xs"></i> Back to blogs
+                        </a>
+                    </div>
+                </article>
+
+                <aside class="lg:col-span-4 space-y-5">
+                    {% if blog_page_content %}
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-2xl font-bold text-dark">{{ blog_page_content.detail_sidebar_title }}</h3>
+                        <div class="mt-5 space-y-4">
+                            {% for recent in recent_blogs %}
+                                <article class="flex gap-3">
+                                    <img src="{{ recent.image_url }}" alt="{{ recent.title }}" class="h-16 w-16 shrink-0 rounded object-cover" />
+                                    <div>
+                                        <a href="{{ recent.get_absolute_url }}" class="text-sm font-semibold leading-5 text-dark hover:text-secondary">{{ recent.title }}</a>
+                                        <p class="mt-1 text-xs text-slate-500">{{ recent.published_on|date:"M d, Y" }}</p>
+                                    </div>
+                                </article>
+                            {% empty %}
+                                <p class="text-sm text-slate-600">No recent blogs.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if related_blogs %}
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-2xl font-bold text-dark">Related Posts</h3>
+                        <div class="mt-5 space-y-4">
+                            {% for related in related_blogs %}
+                                <article class="flex gap-3">
+                                    <img src="{{ related.image_url }}" alt="{{ related.title }}" class="h-16 w-16 shrink-0 rounded object-cover" />
+                                    <div>
+                                        <a href="{{ related.get_absolute_url }}" class="text-sm font-semibold leading-5 text-dark hover:text-secondary">{{ related.title }}</a>
+                                        <p class="mt-1 text-xs text-slate-500">{{ related.category }}</p>
+                                    </div>
+                                </article>
+                            {% empty %}
+                                <p class="text-sm text-slate-600">No related posts yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    {% include 'components/Footer.html' %}
+
+    <div class="quick-actions" aria-label="Quick contact actions">
+        <a href="{{ site_settings.quick_action_email_url }}" class="quick-actions-item qa-email" aria-label="Email us">
+            <i class="fa-solid fa-envelope"></i>
+        </a>
+        <a href="{{ site_settings.quick_action_whatsapp_url }}" class="quick-actions-item qa-whatsapp" aria-label="Chat on WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
+        <a href="{{ site_settings.quick_action_contact_url }}" class="quick-actions-toggle" aria-label="Contact options">
+            <i class="fa-solid fa-message"></i>
+        </a>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        (function () {
+            const csrfToken = document.cookie
+                .split("; ")
+                .find((item) => item.startsWith("csrftoken="))
+                ?.split("=")[1] || "";
+            const likeButton = document.getElementById("blogLikeButton");
+            const shareButton = document.getElementById("blogShareButton");
+            const likeCount = document.getElementById("blogLikeCount");
+            const shareCount = document.getElementById("blogShareCount");
+            const start = Date.now();
+            let readTimeSent = false;
+
+            async function postMetric(url, body) {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                        "X-CSRFToken": csrfToken,
+                    },
+                    credentials: "same-origin",
+                    body: new URLSearchParams(body || {}),
+                });
+                return response.json();
+            }
+
+            if (likeButton && likeCount) {
+                likeButton.addEventListener("click", async function () {
+                    const payload = await postMetric("{% url 'blog_like' blog.slug %}");
+                    if (payload.ok) likeCount.textContent = payload.like_count;
+                });
+            }
+
+            if (shareButton && shareCount) {
+                shareButton.addEventListener("click", async function () {
+                    try {
+                        if (navigator.share) {
+                            await navigator.share({ title: "{{ blog.title|escapejs }}", url: window.location.href });
+                        } else if (navigator.clipboard) {
+                            await navigator.clipboard.writeText(window.location.href);
+                        }
+                    } catch (error) {}
+
+                    const payload = await postMetric("{% url 'blog_share' blog.slug %}");
+                    if (payload.ok) shareCount.textContent = payload.share_count;
+                });
+            }
+
+            function sendReadTime() {
+                if (readTimeSent) return;
+                readTimeSent = true;
+                const seconds = Math.max(5, Math.round((Date.now() - start) / 1000));
+                const payload = new URLSearchParams({
+                    seconds: String(seconds),
+                });
+                fetch("{% url 'blog_read_time' blog.slug %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                        "X-CSRFToken": csrfToken,
+                    },
+                    credentials: "same-origin",
+                    keepalive: true,
+                    body: payload,
+                });
+            }
+
+            window.addEventListener("pagehide", sendReadTime, { once: true });
+            document.addEventListener("visibilitychange", function () {
+                if (document.visibilityState === "hidden") sendReadTime();
+            });
+        })();
+    </script>
+{% endblock %}

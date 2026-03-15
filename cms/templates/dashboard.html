@@ -1,0 +1,42 @@
+﻿{% extends "cms/base.html" %}
+
+{% block title %}Dashboard | CMS{% endblock %}
+
+{% block cms_content %}
+<section>
+    <h1 class="text-3xl font-bold text-slate-900">CMS Dashboard</h1>
+    <p class="mt-2 text-slate-600">Manage homepage content and decide which blogs/projects appear on home.</p>
+
+    <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <article class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <p class="text-sm font-semibold text-slate-500">Hero Slides</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ slides_count }}</p>
+            <a href="{% url 'cms:homepage_manage' %}" class="link link-primary mt-4 inline-block text-sm">Manage</a>
+        </article>
+
+        <article class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <p class="text-sm font-semibold text-slate-500">Projects</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ projects_count }}</p>
+            <a href="{% url 'cms:projects_manage' %}" class="link link-primary mt-4 inline-block text-sm">Manage</a>
+        </article>
+
+        <article class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <p class="text-sm font-semibold text-slate-500">Home Projects</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ home_projects_count }}</p>
+            <a href="{% url 'cms:projects_manage' %}" class="link link-primary mt-4 inline-block text-sm">Select</a>
+        </article>
+
+        <article class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <p class="text-sm font-semibold text-slate-500">Blogs</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ blogs_count }}</p>
+            <a href="{% url 'cms:blogs_manage' %}" class="link link-primary mt-4 inline-block text-sm">Manage</a>
+        </article>
+
+        <article class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <p class="text-sm font-semibold text-slate-500">Home Blogs</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">{{ home_blogs_count }}</p>
+            <a href="{% url 'cms:blogs_manage' %}" class="link link-primary mt-4 inline-block text-sm">Select</a>
+        </article>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,73 @@
+﻿{% extends "cms/base.html" %}
+
+{% block title %}Projects | CMS{% endblock %}
+
+{% block cms_content %}
+<section>
+    <h1 class="text-3xl font-bold text-slate-900">Projects Manager</h1>
+    <p class="mt-2 text-slate-600">Create/edit projects and choose which projects are shown on homepage.</p>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Projects</h2>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="projects">
+            {{ projects_formset.management_form }}
+            {% if projects_formset.non_form_errors %}<p class="text-sm text-red-600">{{ projects_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>Title</th><th>Slug</th><th>Summary</th><th>Image URL</th><th>Vertical Label</th><th>Tag 1</th><th>Tag 2</th><th>Details URL</th><th>Published</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in projects_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.title }}</td>
+                                <td>{{ form.slug }}</td>
+                                <td>{{ form.summary }}</td>
+                                <td>{{ form.image_url }}</td>
+                                <td>{{ form.vertical_label }}</td>
+                                <td>{{ form.tag_one }}</td>
+                                <td>{{ form.tag_two }}</td>
+                                <td>{{ form.details_url }}</td>
+                                <td>{{ form.is_published }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Projects</button>
+        </form>
+    </article>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Homepage Project Selection</h2>
+        <p class="mt-2 text-sm text-slate-600">Use this mapping to control what appears in home projects section and in what order.</p>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home_projects">
+            {{ home_projects_formset.management_form }}
+            {% if home_projects_formset.non_form_errors %}<p class="text-sm text-red-600">{{ home_projects_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>Project</th><th>Order</th><th>Active</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in home_projects_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.project }}</td>
+                                <td>{{ form.display_order }}</td>
+                                <td>{{ form.is_active }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Home Projects</button>
+        </form>
+    </article>
+</section>
+{% endblock %}

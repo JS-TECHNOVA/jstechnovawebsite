@@ -1,0 +1,416 @@
+import json
+from datetime import date
+
+from django.contrib.auth.models import Permission
+from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase
+from django.urls import reverse
+
+from website.models import AuditLog, BlogPost, FaqItem, HomeBlog, MediaAsset, Service, Testimonial
+from website.views import bootstrap_homepage_defaults
+
+
+User = get_user_model()
+
+
+class CmsAccessTests(TestCase):
+    def setUp(self):
+        self.staff_user = User.objects.create_user(
+            username="staff",
+            email="staff@example.com",
+            password="pass12345",
+            is_staff=True,
+        )
+        self.staff_user.user_permissions.set(
+            Permission.objects.filter(content_type__app_label__in=["website", "auth"])
+        )
+        self.normal_user = User.objects.create_user(
+            username="normal",
+            email="normal@example.com",
+            password="pass12345",
+            is_staff=False,
+        )
+        self.limited_staff_user = User.objects.create_user(
+            username="limited",
+            email="limited@example.com",
+            password="pass12345",
+            is_staff=True,
+        )
+
+    def test_dashboard_requires_login(self):
+        response = self.client.get(reverse("cms:dashboard"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("cms:login"), response.url)
+
+    def test_non_staff_user_cannot_access_dashboard(self):
+        self.client.login(username="normal", password="pass12345")
+        response = self.client.get(reverse("cms:dashboard"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("cms:login"), response.url)
+
+    def test_staff_user_can_access_dashboard(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.get(reverse("cms:dashboard"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_staff_user_can_access_services_manager(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.get(reverse("cms:services_manage"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("service_page_form", response.context)
+        self.assertIn("home_services_formset", response.context)
+
+    def test_staff_user_can_access_media_library_manager(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.get(reverse("cms:media_manage"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("page_obj", response.context)
+
+    def test_staff_user_can_access_audit_logs(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.get(reverse("cms:audit_logs"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("page_obj", response.context)
+
+    def test_homepage_manager_supports_panel_navigation(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.get(reverse("cms:homepage_manage"), {"panel": "hero-copy"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["cms_subsection"], "hero-copy")
+
+    def test_pages_manager_supports_panel_navigation(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.get(reverse("cms:pages_manage"), {"panel": "contact-form"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["cms_subsection"], "contact-form")
+
+    def test_staff_without_permission_cannot_access_services_manager(self):
+        self.client.login(username="limited", password="pass12345")
+        response = self.client.get(reverse("cms:services_manage"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_staff_user_can_access_testimonials_and_faq_managers(self):
+        self.client.login(username="staff", password="pass12345")
+        testimonials_response = self.client.get(reverse("cms:testimonials_manage"))
+        faqs_response = self.client.get(reverse("cms:faqs_manage"))
+        self.assertEqual(testimonials_response.status_code, 200)
+        self.assertEqual(faqs_response.status_code, 200)
+        self.assertIn("home_testimonials_formset", testimonials_response.context)
+        self.assertIn("home_faqs_formset", faqs_response.context)
+
+    def test_staff_can_create_service_with_editor_payload(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.post(
+            reverse("cms:service_create"),
+            {
+                "title": "Service via CMS",
+                "slug": "",
+                "icon_class": "fa-solid fa-briefcase",
+                "summary": "Service summary",
+                "image_url": "https://example.com/service.jpg",
+                "cta_text": "Learn more",
+                "details_url": "#",
+                "content_json": '{"blocks":[{"type":"paragraph","data":{"text":"Service body"}}]}',
+                "is_published": "on",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Service.objects.filter(title="Service via CMS").exists())
+        service = Service.objects.get(title="Service via CMS")
+        self.assertEqual(service.content_json.get("blocks", [])[0]["type"], "paragraph")
+        self.assertEqual(service.created_by, self.staff_user)
+        self.assertEqual(service.updated_by, self.staff_user)
+        self.assertTrue(
+            AuditLog.objects.filter(
+                action=AuditLog.ACTION_CREATE,
+                model_label="website.Service",
+                object_pk=str(service.pk),
+                actor=self.staff_user,
+            ).exists()
+        )
+
+    def test_service_update_and_delete_create_audit_logs(self):
+        service = Service.objects.create(
+            title="Audited Service",
+            slug="audited-service",
+            summary="Initial summary",
+            image_url="https://example.com/service.jpg",
+            created_by=self.staff_user,
+            updated_by=self.staff_user,
+        )
+        AuditLog.objects.all().delete()
+
+        self.client.login(username="staff", password="pass12345")
+        edit_response = self.client.post(
+            reverse("cms:service_edit", args=[service.pk]),
+            {
+                "title": "Audited Service",
+                "slug": "audited-service",
+                "icon_class": "fa-solid fa-briefcase",
+                "summary": "Updated summary",
+                "image_url": "https://example.com/service.jpg",
+                "cta_text": "Learn more",
+                "details_url": "#",
+                "content_json": '{"blocks":[{"type":"paragraph","data":{"text":"Updated body"}}]}',
+                "is_published": "on",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(edit_response.status_code, 200)
+        service.refresh_from_db()
+        self.assertEqual(service.updated_by, self.staff_user)
+        update_log = AuditLog.objects.get(action=AuditLog.ACTION_UPDATE, model_label="website.Service", object_pk=str(service.pk))
+        self.assertEqual(update_log.actor, self.staff_user)
+        self.assertIn("summary", update_log.details.get("changed_fields", []))
+
+        delete_response = self.client.post(reverse("cms:service_delete", args=[service.pk]), follow=True)
+
+        self.assertEqual(delete_response.status_code, 200)
+        self.assertFalse(Service.objects.filter(pk=service.pk).exists())
+        self.assertTrue(
+            AuditLog.objects.filter(
+                action=AuditLog.ACTION_DELETE,
+                model_label="website.Service",
+                object_pk=str(service.pk),
+                actor=self.staff_user,
+            ).exists()
+        )
+
+    def test_editor_payload_is_sanitized_before_save(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.post(
+            reverse("cms:service_create"),
+            {
+                "title": "Sanitized Service",
+                "slug": "",
+                "icon_class": "fa-solid fa-briefcase",
+                "summary": "Service summary",
+                "image_url": "https://example.com/service.jpg",
+                "cta_text": "Learn more",
+                "details_url": "#",
+                "content_json": json.dumps(
+                    {
+                        "blocks": [
+                            {"type": "paragraph", "data": {"text": "<script>alert(1)</script><b>Clean body</b>"}},
+                            {
+                                "type": "image",
+                                "data": {
+                                    "file": {"url": "javascript:alert(1)"},
+                                    "caption": "<img src=x onerror=alert(1)>Unsafe",
+                                },
+                            },
+                        ]
+                    }
+                ),
+                "is_published": "on",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        service = Service.objects.get(title="Sanitized Service")
+        self.assertEqual(service.content_json["blocks"][0]["data"]["text"], "alert(1)Clean body")
+        self.assertEqual(len(service.content_json["blocks"]), 1)
+
+    def test_staff_can_create_blog_with_editor_payload(self):
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.post(
+            reverse("cms:blog_create"),
+            {
+                "title": "Blog via CMS",
+                "slug": "",
+                "category": "General",
+                "excerpt": "Blog summary",
+                "image_url": "https://example.com/blog.jpg",
+                "status": BlogPost.STATUS_PUBLISHED,
+                "published_on": "",
+                "comment_count": "",
+                "details_url": "#",
+                "content_json": json.dumps(
+                    {"blocks": [{"type": "paragraph", "data": {"text": "Saved blog body"}}]}
+                ),
+                "is_published": "on",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        blog = BlogPost.objects.get(title="Blog via CMS")
+        self.assertEqual(blog.content_json["blocks"][0]["data"]["text"], "Saved blog body")
+
+    def test_staff_can_create_testimonial_and_faq(self):
+        self.client.login(username="staff", password="pass12345")
+
+        testimonial_response = self.client.post(
+            reverse("cms:testimonial_create"),
+            {
+                "order": "1",
+                "name": "Client A",
+                "role": "Founder",
+                "company": "Startup",
+                "quote": "Great delivery and communication.",
+                "image_url": "https://example.com/client-a.jpg",
+                "rating": "5",
+                "is_published": "on",
+            },
+            follow=True,
+        )
+        faq_response = self.client.post(
+            reverse("cms:faq_create"),
+            {
+                "order": "1",
+                "question": "Do you support post-launch maintenance?",
+                "answer": "Yes, we provide support and iterative improvements.",
+                "is_published": "on",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(testimonial_response.status_code, 200)
+        self.assertEqual(faq_response.status_code, 200)
+        self.assertTrue(Testimonial.objects.filter(name="Client A").exists())
+        self.assertTrue(FaqItem.objects.filter(question="Do you support post-launch maintenance?").exists())
+
+    def test_home_blog_mapping_allows_only_one_active_featured(self):
+        bootstrap_homepage_defaults()
+        HomeBlog.objects.all().delete()
+        BlogPost.objects.all().delete()
+
+        blog_one = BlogPost.objects.create(
+            title="Blog One",
+            slug="blog-one",
+            category="General",
+            excerpt="First blog",
+            image_url="https://example.com/1.jpg",
+            published_on=date(2026, 1, 10),
+        )
+        blog_two = BlogPost.objects.create(
+            title="Blog Two",
+            slug="blog-two",
+            category="General",
+            excerpt="Second blog",
+            image_url="https://example.com/2.jpg",
+            published_on=date(2026, 1, 11),
+        )
+
+        entry_one = HomeBlog.objects.create(blog=blog_one, display_order=1, is_featured=False, is_active=True)
+        entry_two = HomeBlog.objects.create(blog=blog_two, display_order=2, is_featured=False, is_active=True)
+
+        self.client.login(username="staff", password="pass12345")
+        response = self.client.post(
+            reverse("cms:blogs_manage"),
+            {
+                "form_type": "home_blogs",
+                "home_blogs-TOTAL_FORMS": "2",
+                "home_blogs-INITIAL_FORMS": "2",
+                "home_blogs-MIN_NUM_FORMS": "0",
+                "home_blogs-MAX_NUM_FORMS": "1000",
+                "home_blogs-0-id": str(entry_one.id),
+                "home_blogs-0-blog": str(blog_one.id),
+                "home_blogs-0-display_order": "1",
+                "home_blogs-0-is_featured": "on",
+                "home_blogs-0-is_active": "on",
+                "home_blogs-1-id": str(entry_two.id),
+                "home_blogs-1-blog": str(blog_two.id),
+                "home_blogs-1-display_order": "2",
+                "home_blogs-1-is_featured": "on",
+                "home_blogs-1-is_active": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["home_blogs_formset"].non_form_errors())
+
+    def test_staff_can_upload_editorjs_image(self):
+        self.client.login(username="staff", password="pass12345")
+        image_bytes = (
+            b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01"
+            b"\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDAT\x08\x99c``\x00\x00\x00\x04\x00\x01"
+            b"\xf6\x178U\x00\x00\x00\x00IEND\xaeB`\x82"
+        )
+        upload = SimpleUploadedFile("tiny.png", image_bytes, content_type="image/png")
+
+        response = self.client.post(reverse("cms:editorjs_image_upload"), {"image": upload})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["success"], 1)
+        self.assertRegex(payload["file"]["url"], r"/media/media-library/images/\d{4}/\d{2}/")
+
+    def test_staff_can_upload_media_file(self):
+        self.client.login(username="staff", password="pass12345")
+        file_bytes = b"%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF"
+        upload = SimpleUploadedFile("brief.pdf", file_bytes, content_type="application/pdf")
+
+        response = self.client.post(reverse("cms:media_asset_upload"), {"file": upload})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["success"], 1)
+        self.assertRegex(payload["file"]["url"], r"/media/media-library/files/\d{4}/\d{2}/")
+        self.assertEqual(payload["asset"]["asset_type"], MediaAsset.TYPE_FILE)
+
+    def test_staff_can_upload_media_video(self):
+        self.client.login(username="staff", password="pass12345")
+        video_bytes = b"\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00mp42isom"
+        upload = SimpleUploadedFile("demo.mp4", video_bytes, content_type="video/mp4")
+
+        response = self.client.post(reverse("cms:media_asset_upload"), {"file": upload})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["success"], 1)
+        self.assertEqual(payload["asset"]["asset_type"], MediaAsset.TYPE_VIDEO)
+        self.assertRegex(payload["file"]["url"], r"/media/media-library/videos/\d{4}/\d{2}/")
+
+    def test_media_library_data_endpoint_filters_assets(self):
+        self.client.login(username="staff", password="pass12345")
+        MediaAsset.objects.create(
+            title="Quarterly Brief",
+            caption="Document asset",
+            original_name="brief.pdf",
+            file="media-library/files/brief.pdf",
+            asset_type=MediaAsset.TYPE_FILE,
+        )
+        MediaAsset.objects.create(
+            title="Homepage Hero",
+            original_name="hero.jpg",
+            file="media-library/images/hero.jpg",
+            asset_type=MediaAsset.TYPE_IMAGE,
+        )
+
+        response = self.client.get(reverse("cms:media_library_data"), {"type": MediaAsset.TYPE_IMAGE})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertTrue(payload["ok"])
+        self.assertEqual(len(payload["assets"]), 1)
+        self.assertEqual(payload["assets"][0]["asset_type"], MediaAsset.TYPE_IMAGE)
+
+    def test_staff_can_update_media_title_and_caption(self):
+        self.client.login(username="staff", password="pass12345")
+        asset = MediaAsset.objects.create(
+            title="Old title",
+            original_name="hero.jpg",
+            file="media-library/images/hero.jpg",
+            asset_type=MediaAsset.TYPE_IMAGE,
+        )
+
+        response = self.client.post(
+            reverse("cms:media_update", args=[asset.pk]),
+            {
+                "title": "Homepage hero",
+                "caption": "Primary banner image for the homepage.",
+                "next": reverse("cms:media_manage"),
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        asset.refresh_from_db()
+        self.assertEqual(asset.title, "Homepage hero")
+        self.assertEqual(asset.caption, "Primary banner image for the homepage.")

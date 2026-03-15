@@ -1,0 +1,69 @@
+{% extends "cms/base.html" %}
+
+{% block title %}Footer Manage | CMS{% endblock %}
+
+{% block cms_content %}
+<section>
+    <h1 class="text-3xl font-bold text-slate-900">Footer Manage</h1>
+    <p class="mt-2 text-slate-600">Manage footer text, contact info, and footer links.</p>
+
+    <div class="mt-7 grid gap-6 xl:grid-cols-2">
+        <article class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="text-xl font-bold text-slate-900">Footer Content</h2>
+            <form method="post" class="mt-5 space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="footer_content">
+                {% for field in footer_form %}
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-neutral">Save Footer Content</button>
+            </form>
+        </article>
+    </div>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Footer Links</h2>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="footer_links">
+            {{ footer_links_formset.management_form }}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                            <th>Link</th>
+                            <th>Order</th>
+                            <th>Active</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for footer_link_form in footer_links_formset %}
+                            <tr>
+                                <td>
+                                    {{ footer_link_form.id }}
+                                    {{ footer_link_form.label }}
+                                </td>
+                                <td>{{ footer_link_form.link }}</td>
+                                <td>{{ footer_link_form.order }}</td>
+                                <td>{{ footer_link_form.is_active }}</td>
+                                <td>{% if footer_link_form.instance.pk %}{{ footer_link_form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Footer Links</button>
+        </form>
+    </article>
+</section>
+{% endblock %}

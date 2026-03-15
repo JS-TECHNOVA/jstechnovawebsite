@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load editorjs %}
+
+{% block title %}<title>{{ seo.title }}</title>{% endblock %}
+
+{% block content %}
+    {% include 'components/TopBar.html' %}
+    {% include 'components/Header.html' %}
+
+    <section class="section-space bg-[linear-gradient(180deg,#f6f9ff_0%,#eef4fc_100%)]">
+        <div class="container px-6">
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
+                <article class="lg:col-span-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <img src="{{ project.image_url }}" alt="{{ project.title }}" class="h-[340px] w-full object-cover md:h-[460px]" />
+                    <div class="p-6 md:p-10">
+                        <div class="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                            <span class="rounded-full bg-brand-100 px-3 py-1 font-medium">{{ project.category }}</span>
+                            <span>|</span>
+                            <span>{{ project.status }}</span>
+                            {% if project.project_year %}<span>|</span><span>{{ project.project_year }}</span>{% endif %}
+                        </div>
+                        <h1 class="mt-5 text-3xl font-extrabold leading-[1.15] text-dark md:text-5xl">{{ project.title }}</h1>
+                        <p class="mt-5 text-base leading-8 text-slate-600 md:text-lg">{{ project.summary }}</p>
+                        <div class="prose prose-slate mt-8 max-w-none">{{ project.content_json|render_editorjs }}</div>
+                        <a href="{% url 'projects' %}" class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-dark hover:text-secondary"><i class="fa-solid fa-arrow-left text-xs"></i> {{ project_page_content.detail_back_text }}</a>
+                    </div>
+                </article>
+                <aside class="space-y-5 lg:col-span-4">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-2xl font-bold text-dark">{{ project_page_content.detail_meta_title }}</h3>
+                        <div class="mt-5 space-y-4 text-sm">
+                            <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-3"><span class="text-slate-500">{{ project_page_content.detail_client_label }}</span><span class="font-semibold text-dark">{{ project.client_name|default:project_page_content.detail_default_client_name }}</span></div>
+                            <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-3"><span class="text-slate-500">{{ project_page_content.detail_category_label }}</span><span class="font-semibold text-dark">{{ project.category }}</span></div>
+                            <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-3"><span class="text-slate-500">{{ project_page_content.detail_status_label }}</span><span class="font-semibold text-dark">{{ project.status }}</span></div>
+                            <div class="flex items-start justify-between gap-3"><span class="text-slate-500">{{ project_page_content.detail_tags_label }}</span><span class="font-semibold text-dark">{{ project.tag_one }}{% if project.tag_two %}, {{ project.tag_two }}{% endif %}</span></div>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-2xl font-bold text-dark">{{ project_page_content.detail_recent_title }}</h3>
+                        <div class="mt-5 space-y-4">
+                            {% for recent in recent_projects %}
+                                <article class="flex gap-3">
+                                    <img src="{{ recent.image_url }}" alt="{{ recent.title }}" class="h-16 w-16 shrink-0 rounded object-cover" />
+                                    <div>
+                                        <a href="{{ recent.get_absolute_url }}" class="text-sm font-semibold leading-5 text-dark hover:text-secondary">{{ recent.title }}</a>
+                                        <p class="mt-1 text-xs text-slate-500">{{ recent.category }}</p>
+                                    </div>
+                                </article>
+                            {% empty %}
+                                <p class="text-sm text-slate-600">{{ project_page_content.detail_empty_recent_text }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    {% include 'components/Footer.html' %}
+
+    <div class="quick-actions" aria-label="Quick contact actions">
+        <a href="{{ site_settings.quick_action_email_url }}" class="quick-actions-item qa-email" aria-label="Email us"><i class="fa-solid fa-envelope"></i></a>
+        <a href="{{ site_settings.quick_action_whatsapp_url }}" class="quick-actions-item qa-whatsapp" aria-label="Chat on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="{{ site_settings.quick_action_contact_url }}" class="quick-actions-toggle" aria-label="Contact options"><i class="fa-solid fa-message"></i></a>
+    </div>
+{% endblock %}

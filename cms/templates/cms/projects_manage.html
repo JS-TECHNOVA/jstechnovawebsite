@@ -1,0 +1,270 @@
+{% extends "cms/base.html" %}
+
+{% block title %}<title>Projects | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="space-y-6">
+    <article class="relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(135deg,#03163a_0%,#0d2457_60%,#1657db_100%)] px-6 py-7 text-white shadow-[0_30px_80px_rgba(3,22,58,0.28)] md:px-8">
+        <div class="absolute -right-14 -top-20 h-60 w-60 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.24)_0%,rgba(255,255,255,0)_72%)]"></div>
+        <div class="absolute -bottom-44 -left-24 h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.36)_0%,rgba(59,130,246,0)_70%)]"></div>
+        <div class="relative z-10 flex flex-wrap items-end justify-between gap-5">
+            <div>
+                <span class="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-white/90"><i class="fa-solid fa-diagram-project"></i> Portfolio Control</span>
+                <h1 class="mt-4 text-4xl font-black tracking-tight">Projects Manager</h1>
+                <p class="mt-4 max-w-[58ch] text-sm leading-7 text-blue-50/78">Manage project-page storytelling, process steps, published portfolio entries, and homepage featured selections.</p>
+            </div>
+            {% if can_add_project %}<a href="{% url 'cms:project_create' %}" class="btn btn-neutral">Add New Project</a>{% endif %}
+        </div>
+    </article>
+
+    <div class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <article class="rounded-[28px] border border-slate-200/70 bg-white/90 px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900">Project Page Content</h2>
+                    <p class="mt-2 text-sm text-slate-600">Core copy only. Hero, featured project story, and listing/detail labels.</p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Simplified</span>
+            </div>
+            <form method="post" class="mt-5 space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="project_page">
+
+                <section class="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Hero</p>
+                        <h3 class="mt-1 text-lg font-black text-slate-900">Top section</h3>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        {% include "cms/includes/form_field.html" with field=project_page_form.hero_title %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.hero_image_url %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.intro_badge %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.intro_title %}
+                        <div class="md:col-span-2">{% include "cms/includes/form_field.html" with field=project_page_form.intro_description %}</div>
+                    </div>
+                </section>
+
+                <section class="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Featured</p>
+                        <h3 class="mt-1 text-lg font-black text-slate-900">Featured project block</h3>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        {% include "cms/includes/form_field.html" with field=project_page_form.featured_badge %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.featured_title %}
+                        <div class="md:col-span-2">{% include "cms/includes/form_field.html" with field=project_page_form.featured_description %}</div>
+                        {% include "cms/includes/form_field.html" with field=project_page_form.featured_image_url %}
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-3">
+                        <div class="rounded-[20px] border border-slate-200 bg-white p-4">
+                            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Stat One</p>
+                            <div class="space-y-4">
+                                {% include "cms/includes/form_field.html" with field=project_page_form.featured_stat_one_value %}
+                                {% include "cms/includes/form_field.html" with field=project_page_form.featured_stat_one_label %}
+                            </div>
+                        </div>
+                        <div class="rounded-[20px] border border-slate-200 bg-white p-4">
+                            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Stat Two</p>
+                            <div class="space-y-4">
+                                {% include "cms/includes/form_field.html" with field=project_page_form.featured_stat_two_value %}
+                                {% include "cms/includes/form_field.html" with field=project_page_form.featured_stat_two_label %}
+                            </div>
+                        </div>
+                        <div class="rounded-[20px] border border-slate-200 bg-white p-4">
+                            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Stat Three</p>
+                            <div class="space-y-4">
+                                {% include "cms/includes/form_field.html" with field=project_page_form.featured_stat_three_value %}
+                                {% include "cms/includes/form_field.html" with field=project_page_form.featured_stat_three_label %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Labels</p>
+                        <h3 class="mt-1 text-lg font-black text-slate-900">Listing and detail text</h3>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        {% include "cms/includes/form_field.html" with field=project_page_form.process_badge %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.process_title %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.filter_all_label %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.card_cta_text %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.empty_state_text %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_back_text %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_meta_title %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_recent_title %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_client_label %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_category_label %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_status_label %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_tags_label %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_default_client_name %}
+                        {% include "cms/includes/form_field.html" with field=project_page_form.detail_empty_recent_text %}
+                    </div>
+                </section>
+
+                {% if can_change_project_page %}<button type="submit" class="btn btn-neutral">Save Project Page Content</button>{% endif %}
+            </form>
+        </article>
+
+        <article class="rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.06)]">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-blue-600">Search Metadata</p>
+                    <h2 class="mt-2 text-2xl font-black text-slate-900">Projects SEO</h2>
+                    <p class="mt-2 text-sm text-slate-600">Meta, social sharing, and schema settings for the projects listing page.</p>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Meta / OG / Schema</span>
+            </div>
+            <form method="post" class="mt-5 space-y-5">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="project_page">
+                <div class="grid gap-4 md:grid-cols-2">
+                    {% for field in project_page_form %}
+                        {% if field.name in seo_field_names %}
+                            <div class="{% if field.name == 'seo_meta_description' or field.name == 'seo_og_description' or field.name == 'seo_schema_json_ld' %}md:col-span-2{% endif %}">
+                                {% include "cms/includes/form_field.html" with field=field %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% if can_change_project_page %}<button type="submit" class="btn btn-neutral">Save Projects SEO</button>{% endif %}
+            </form>
+        </article>
+    </div>
+
+    <article class="rounded-[28px] border border-slate-200/70 bg-white/90 px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+        <h2 class="text-2xl font-black text-slate-900">Project Process Steps</h2>
+        <form method="post" class="mt-5 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="process">
+            {{ process_steps_formset.management_form }}
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {% for form in process_steps_formset %}
+                    <article class="space-y-3 rounded-[20px] border border-slate-200/70 bg-slate-50/90 p-4">
+                        {{ form.id }}
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Order</label>
+                            {{ form.order }}
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Label</label>
+                            {{ form.label }}
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Title</label>
+                            {{ form.title }}
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Description</label>
+                            {{ form.description }}
+                        </div>
+                        {% if form.instance.pk %}
+                            <label class="flex items-center gap-2 text-sm font-medium text-slate-500">{{ form.DELETE }} Remove step</label>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+            {% if can_change_process %}<button type="submit" class="btn btn-neutral">Save Project Steps</button>{% endif %}
+        </form>
+    </article>
+
+    <article class="rounded-[28px] border border-slate-200/70 bg-white/90 px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900">All Projects</h2>
+                <p class="mt-2 text-sm text-slate-600">Card-based overview for the published portfolio with quick edit and delete actions.</p>
+            </div>
+            <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-700">{{ paginator.count }} total</span>
+        </div>
+
+        {% if page_obj.object_list %}
+            <div class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {% for project in page_obj.object_list %}
+                    <article class="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_16px_44px_rgba(15,23,42,0.06)]">
+                        <div class="relative h-[180px] overflow-hidden bg-[linear-gradient(135deg,#dbeafe_0%,#eff6ff_100%)]">
+                            {% if project.image_url %}
+                                <img src="{{ project.image_url }}" alt="{{ project.title }}" class="h-full w-full object-cover" />
+                            {% else %}
+                                <div class="flex h-full items-center justify-center text-3xl text-blue-700"><i class="fa-regular fa-image"></i></div>
+                            {% endif %}
+                        </div>
+                        <div class="p-5">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-700">{{ project.category }}</span>
+                                {% if project.is_published %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-700">Published</span>
+                                {% else %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-amber-700">Draft</span>
+                                {% endif %}
+                            </div>
+                            <h3 class="mt-4 text-2xl font-black text-slate-900">{{ project.title }}</h3>
+                            <p class="mt-2 text-sm text-slate-500">/{{ project.slug }}/</p>
+                            <p class="mt-4 text-sm leading-7 text-slate-600">{{ project.summary }}</p>
+                            <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                <span>{{ project.status }}</span>
+                                {% if project.project_year %}<span>{{ project.project_year }}</span>{% endif %}
+                            </div>
+                            <div class="mt-5 flex gap-2">
+                                {% if can_change_project %}<a href="{% url 'cms:project_edit' project.pk %}" class="btn btn-sm btn-outline">Edit</a>{% endif %}
+                                {% if can_delete_project %}
+                                <form method="post" action="{% url 'cms:project_delete' project.pk %}" onsubmit="return confirm('Delete this project?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-error text-white">Delete</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center text-slate-600">No projects created yet.</div>
+        {% endif %}
+
+        {% if page_obj.has_other_pages %}
+            <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+                {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline">Prev</a>{% endif %}
+                {% for num in paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="inline-flex h-10 min-w-10 items-center justify-center rounded-full bg-slate-900 px-3 text-sm font-semibold text-white">{{ num }}</span>
+                    {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                        <a href="?page={{ num }}" class="inline-flex h-10 min-w-10 items-center justify-center rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline">Next</a>{% endif %}
+            </div>
+        {% endif %}
+    </article>
+
+    <article class="rounded-[28px] border border-slate-200/70 bg-white/90 px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+        <h2 class="text-2xl font-black text-slate-900">Homepage Project Selection</h2>
+        <p class="mt-2 text-sm text-slate-600">Manage the projects surfaced on the homepage with direct card-based controls.</p>
+        <form method="post" class="mt-5 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home_projects">
+            {{ home_projects_formset.management_form }}
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {% for form in home_projects_formset %}
+                    <article class="space-y-3 rounded-[20px] border border-slate-200/70 bg-slate-50/90 p-4">
+                        {{ form.id }}
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Project</label>
+                            {{ form.project }}
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Order</label>
+                            {{ form.display_order }}
+                        </div>
+                        <label class="flex items-center gap-2 text-sm font-medium text-slate-700">{{ form.is_active }} Active</label>
+                        {% if form.instance.pk %}
+                            <label class="flex items-center gap-2 text-sm font-medium text-slate-500">{{ form.DELETE }} Remove mapping</label>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+            {% if can_change_home_projects %}<button type="submit" class="btn btn-neutral">Save Home Projects</button>{% endif %}
+        </form>
+    </article>
+</section>
+{% endblock %}

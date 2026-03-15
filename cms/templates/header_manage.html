@@ -1,0 +1,125 @@
+{% extends "cms/base.html" %}
+
+{% block title %}Header Manage | CMS{% endblock %}
+
+{% block cms_content %}
+<section>
+    <h1 class="text-3xl font-bold text-slate-900">Header Manage</h1>
+    <p class="mt-2 text-slate-600">Menu supports two types: normal link and dropdown menu. Enable chevron for dropdown type and then open "Children" to add icon, label, small text, and link for each dropdown item.</p>
+
+    <div class="mt-7 grid gap-6 xl:grid-cols-2">
+        <article class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="text-xl font-bold text-slate-900">Header Settings</h2>
+            <form method="post" class="mt-5 space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="header_content">
+                {% for field in form %}
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-neutral">Save Header Settings</button>
+            </form>
+        </article>
+
+        <article class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="text-xl font-bold text-slate-900">Icon Tips</h2>
+            <p class="mt-2 text-sm text-slate-600">
+                In menu item labels, you can use Font Awesome icons:
+                <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">&lt;i class="fa-solid fa-house"&gt;&lt;/i&gt; Home</code>
+            </p>
+            <div class="mt-4 grid gap-3 text-sm text-slate-700">
+                <div class="rounded-lg bg-slate-50 p-3">
+                    <i class="fa-solid fa-house mr-2"></i>fa-solid fa-house
+                </div>
+                <div class="rounded-lg bg-slate-50 p-3">
+                    <i class="fa-solid fa-circle-info mr-2"></i>fa-solid fa-circle-info
+                </div>
+                <div class="rounded-lg bg-slate-50 p-3">
+                    <i class="fa-solid fa-briefcase mr-2"></i>fa-solid fa-briefcase
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Header Menu Items</h2>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="header_menu">
+            {{ formset.management_form }}
+
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Label (Icon + Text)</th>
+                            <th>Link</th>
+                            <th>Dropdown</th>
+                            <th>Children</th>
+                            <th>Order</th>
+                            <th>Active</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for menu_form in formset %}
+                            <tr>
+                                <td>
+                                    {{ menu_form.id }}
+                                    {{ menu_form.label }}
+                                    {% if menu_form.label.help_text %}<p class="mt-1 text-xs text-slate-500">{{ menu_form.label.help_text }}</p>{% endif %}
+                                </td>
+                                <td>{{ menu_form.link }}</td>
+                                <td>{{ menu_form.show_chevron }}</td>
+                                <td>
+                                    {% if menu_form.instance.pk %}
+                                        <a href="{% url 'cms:header_menu_children' menu_form.instance.pk %}" class="btn btn-xs btn-outline">Manage</a>
+                                    {% else %}
+                                        <span class="text-xs text-slate-500">Save first</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ menu_form.order }}</td>
+                                <td>{{ menu_form.is_active }}</td>
+                                <td>{% if menu_form.instance.pk %}{{ menu_form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                            {% if menu_form.non_field_errors %}
+                                <tr>
+                                    <td colspan="7">
+                                        <p class="text-sm text-red-600">{{ menu_form.non_field_errors|join:", " }}</p>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Header Menu</button>
+        </form>
+    </article>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Dropdown Quick Access</h2>
+        <p class="mt-2 text-sm text-slate-600">Use this list to jump directly into child-item management for each menu.</p>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            {% for item in saved_menu_items %}
+                <div class="rounded-lg border border-slate-200 p-4">
+                    <p class="text-sm font-semibold text-slate-900">{{ item.label|safe }}</p>
+                    <p class="mt-1 text-xs text-slate-500">
+                        {% if item.show_chevron %}Dropdown enabled{% else %}Normal link{% endif %}
+                    </p>
+                    <a href="{% url 'cms:header_menu_children' item.id %}" class="btn btn-sm btn-outline mt-3">Manage Children</a>
+                </div>
+            {% empty %}
+                <p class="text-sm text-slate-600">Save at least one header menu item to manage child items.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

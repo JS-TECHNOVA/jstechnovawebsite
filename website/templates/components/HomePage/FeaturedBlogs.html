@@ -1,0 +1,98 @@
+<section class="section-space bg-[#edf3fb]">
+    <div class="container px-6">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between" data-aos="fade-up">
+            <div class="max-w-3xl">
+                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
+                    • {{ homepage_content.blogs_badge }} •
+                </p>
+                <h2 class="mt-4 max-w-[20ch] text-2xl font-extrabold leading-[1.12] text-dark md:text-4xl xl:text-[3.1rem]">
+                    {{ homepage_content.blogs_title }}
+                </h2>
+            </div>
+
+            <a href="{{ homepage_content.blogs_button_url }}" class="group/button relative inline-block h-12 w-40 self-start cursor-pointer lg:self-auto">
+                <div class="relative flex h-full w-full items-center justify-between overflow-hidden rounded-full border border-gray-300 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                    <div class="absolute bottom-1 left-1 top-1 flex w-10 items-center justify-center rounded-full bg-indigo-600 transition-all duration-500 ease-in-out group-hover/button:w-[calc(100%-0.5rem)]">
+                        <i class="fa-solid fa-arrow-right text-sm text-white"></i>
+                    </div>
+                    <span class="ml-14 text-sm font-medium text-gray-700 transition-colors duration-300 group-hover/button:text-white">
+                        {{ homepage_content.blogs_button_text }}
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <div class="mt-10 grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]" data-aos="fade-up" data-aos-delay="120">
+            {% if home_featured_blog %}
+                <article class="overflow-hidden bg-white shadow-sm">
+                    <a href="{{ home_featured_blog.get_absolute_url }}" class="block overflow-hidden">
+                        <img
+                            src="{{ home_featured_blog.image_url }}"
+                            alt="{{ home_featured_blog.title }}"
+                            class="h-[310px] w-full object-cover transition duration-500 hover:scale-[1.02] md:h-[420px]" />
+                    </a>
+
+                    <div class="p-6 md:p-7">
+                        <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                            <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium">{{ home_featured_blog.category }}</span>
+                            <span>{{ home_featured_blog.published_on|date:"M d, Y" }}</span>
+                            <span>•</span>
+                            <span>{{ home_featured_blog.comment_count }} Comments</span>
+                        </div>
+
+                        <h3 class="mt-5 max-w-[18ch] text-[1.85rem] font-extrabold leading-[1.14] text-dark md:text-[2.15rem]">
+                            <a href="{{ home_featured_blog.get_absolute_url }}" class="transition hover:text-secondary">
+                                {{ home_featured_blog.title }}
+                            </a>
+                        </h3>
+                        <p class="mt-5 max-w-[56ch] text-base leading-8 text-slate-600">
+                            {{ home_featured_blog.excerpt }}
+                        </p>
+                        <a href="{{ home_featured_blog.get_absolute_url }}" class="mt-6 inline-flex items-center gap-3 text-base font-semibold text-dark transition hover:text-secondary">
+                            Read more
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </article>
+            {% else %}
+                <article class="bg-white p-6 text-slate-700 shadow-sm md:p-7">
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">No featured story</p>
+                    <p class="mt-4 text-base leading-7">Publish a blog and mark homepage entries to populate this section.</p>
+                </article>
+            {% endif %}
+
+            <div class="space-y-6">
+                {% for blog in home_secondary_blogs %}
+                    <article class="bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md sm:p-5" data-aos="fade-left" data-aos-delay="{{ forloop.counter|add:'1' }}00">
+                        <div class="grid gap-4 sm:grid-cols-[156px_minmax(0,1fr)] sm:items-center">
+                            <a href="{{ blog.get_absolute_url }}" class="block overflow-hidden">
+                                <img
+                                    src="{{ blog.image_url }}"
+                                    alt="{{ blog.title }}"
+                                    class="h-[150px] w-full object-cover transition duration-500 hover:scale-[1.03]" />
+                            </a>
+
+                            <div>
+                                <span class="inline-flex rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-500">{{ blog.category }}</span>
+                                <h3 class="mt-4 max-w-[20ch] text-[1.7rem] font-extrabold leading-[1.12] text-dark">
+                                    <a href="{{ blog.get_absolute_url }}" class="transition hover:text-secondary">
+                                        {{ blog.title }}
+                                    </a>
+                                </h3>
+                                <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                                    <span>{{ blog.published_on|date:"M d, Y" }}</span>
+                                    <span>•</span>
+                                    <span>{{ blog.comment_count }} Comments</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <article class="bg-white p-6 text-slate-700 shadow-sm">
+                        Add at least two homepage blog entries to populate the stacked blog cards.
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% include 'components/TopBar.html' %}
+    {% include 'components/Header.html' %}
+    {% if homepage_content and hero_slides %}
+        {% include 'components/HomePage/Hero.html' %}
+    {% endif %}
+    {% if homepage_content and core_features %}
+        {% include 'components/HomePage/CoreFeatures.html' %}
+    {% endif %}
+    {% if homepage_content and why_choose_items %}
+        {% include 'components/HomePage/WhyChooseUs.html' %}
+    {% endif %}
+
+    {% if service_page_content and home_services %}
+        {% include 'components/HomePage/Services.html' %}
+    {% endif %}
+    {% if homepage_content and home_testimonials %}
+        {% include 'components/HomePage/Testimonials.html' %}
+    {% endif %}
+    {% if homepage_content and home_projects %}
+        {% include 'components/HomePage/FeaturedProjects.html' %}
+    {% endif %}
+    {% if homepage_content and home_featured_blog %}
+        {% include 'components/HomePage/FeaturedBlogs.html' %}
+    {% endif %}
+
+    {% if homepage_content %}
+<section class="relative overflow-hidden bg-dark py-16 md:py-20">
+        <div class="pointer-events-none absolute inset-0">
+            <div
+                class="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(25,107,255,0.22),transparent_35%),radial-gradient(circle_at_80%_15%,rgba(25,107,255,0.16),transparent_32%),linear-gradient(180deg,#03163a_0%,#021230_100%)]">
+            </div>
+            <div
+                class="absolute inset-0 opacity-15 [background-size:130px_130px] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)]">
+            </div>
+        </div>
+
+        <div class="container relative z-10 px-6" data-aos="fade-up">
+            <div class="rounded-3xl border border-white/15 bg-white/5 p-7 md:p-10">
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center">
+                    <div class="lg:col-span-8">
+                        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">{{ homepage_content.final_cta_badge }}</p>
+                        <h2 class="mt-4 max-w-[20ch] text-3xl font-extrabold leading-[1.1] text-white md:text-5xl">
+                            {{ homepage_content.final_cta_title }}
+                        </h2>
+                        <p class="mt-4 max-w-[58ch] text-sm leading-7 text-slate-300 md:text-base">
+                            {{ homepage_content.final_cta_description }}
+                        </p>
+                    </div>
+                    <div class="lg:col-span-4 lg:text-right">
+                        <a href="{{ homepage_content.final_cta_button_url }}" class="group/button inline-block relative h-14 w-56 cursor-pointer">
+                            <div
+                                class="relative flex h-full w-full items-center justify-between overflow-hidden rounded-full border border-gray-300 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                                <div
+                                    class="absolute bottom-1 left-1 top-1 flex w-12 items-center justify-center rounded-full bg-indigo-600 transition-all duration-500 ease-in-out group-hover/button:w-[calc(100%-0.5rem)]">
+                                    <i class="fa-solid fa-arrow-right text-sm text-white"></i>
+                                </div>
+                                <span class="ml-17 text-base font-semibold text-gray-800 transition-colors duration-300 group-hover/button:text-white">
+                                    {{ homepage_content.final_cta_button_text }}
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if homepage_content and home_faqs %}
+        {% include 'components/HomePage/Faq.html' %}
+    {% endif %}
+    {% include 'components/Footer.html' %}
+
+    <script>
+        // ------- Config -------
+        const AUTO_MS = 5000;
+
+        // ------- Elements -------
+        const slides = Array.from(document.querySelectorAll(".hero-slide"));
+        const dotsWrap = document.getElementById("dots");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const testimonialTrack = document.getElementById("testimonialTrack");
+        const testimonialPrev = document.getElementById("testimonialPrev");
+        const testimonialNext = document.getElementById("testimonialNext");
+        const faqTriggers = Array.from(document.querySelectorAll("[data-faq-trigger]"));
+        const mobileMenuOpenBtn = document.getElementById("mobileMenuOpenBtn");
+        const mobileMenuCloseBtn = document.getElementById("mobileMenuCloseBtn");
+        const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+        const mobileMenuPanel = document.getElementById("mobileMenuPanel");
+        const mobileMenuBackdrop = document.getElementById("mobileMenuBackdrop");
+        const mobileMenuLinks = Array.from(document.querySelectorAll("[data-mobile-menu-link]"));
+
+        // Animated left content nodes
+        const badge = document.getElementById("heroBadge");
+        const title = document.getElementById("heroTitle");
+        const desc = document.getElementById("heroDesc");
+        const cta = document.getElementById("heroCta");
+        const textNodes = [
+            { el: badge, from: "translate-y-2" },
+            { el: title, from: "translate-y-3" },
+            { el: desc, from: "translate-y-3" },
+            { el: cta, from: "translate-y-3" },
+        ];
+        const textTimers = [];
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const slideData = [
+            {% for slide in hero_slides %}
+                {
+                    badge: "{{ slide.badge|escapejs }}",
+                    title: "{{ slide.title|escapejs }}",
+                    desc: "{{ slide.description|escapejs }}"
+                }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        // ------- Helpers -------
+        function setSlideBg() {
+            slides.forEach((s) => {
+                const url = s.getAttribute("data-img");
+                s.style.backgroundImage = `url('${url}')`;
+                s.style.backgroundSize = "cover";
+                s.style.backgroundPosition = "center";
+            });
+        }
+
+        function setActiveSlide(index) {
+            slides.forEach((s, i) => {
+                s.classList.toggle("opacity-100", i === index);
+                s.classList.toggle("opacity-0", i !== index);
+            });
+            [...dotsWrap.children].forEach((d, i) => {
+                d.classList.toggle("bg-white", i === index);
+                d.classList.toggle("bg-white/40", i !== index);
+                d.classList.toggle("w-8", i === index);
+                d.classList.toggle("w-2.5", i !== index);
+            });
+        }
+
+        function clearTextTimers() {
+            while (textTimers.length) {
+                clearTimeout(textTimers.pop());
+            }
+        }
+
+        function resetTextState() {
+            textNodes.forEach(({ el, from }) => {
+                el.classList.remove("opacity-100", "translate-y-0");
+                el.classList.add("opacity-0", from);
+            });
+        }
+
+        // Re-trigger animations AFTER slide changes
+        function playTextAnimation() {
+            clearTextTimers();
+            resetTextState();
+
+            if (prefersReducedMotion) {
+                textNodes.forEach(({ el, from }) => {
+                    el.classList.add("opacity-100", "translate-y-0");
+                    el.classList.remove("opacity-0", from);
+                });
+                return;
+            }
+
+            const startDelay = 140;
+            const stagger = 130;
+            textNodes.forEach(({ el, from }, i) => {
+                const timer = setTimeout(() => {
+                    el.classList.add("opacity-100", "translate-y-0");
+                    el.classList.remove("opacity-0", from);
+                }, startDelay + i * stagger);
+                textTimers.push(timer);
+            });
+        }
+
+        function setText(index) {
+            const d = slideData[index];
+            if (!d) return;
+            badge.textContent = d.badge;
+            title.textContent = d.title;
+            desc.textContent = d.desc;
+        }
+
+        // ------- Init dots -------
+        function initDots() {
+            dotsWrap.innerHTML = "";
+            slides.forEach((_, i) => {
+                const dot = document.createElement("button");
+                dot.className =
+                    "h-2.5 w-2.5 rounded-full bg-white/40 transition-all duration-300";
+                dot.setAttribute("aria-label", `Go to slide ${i + 1}`);
+                dot.addEventListener("click", () => goTo(i, true));
+                dotsWrap.appendChild(dot);
+            });
+        }
+
+        let idx = 0;
+        let timer = null;
+
+        function goTo(nextIndex, userAction = false) {
+            if (!slides.length) return;
+            idx = (nextIndex + slides.length) % slides.length;
+
+            // update slide
+            setActiveSlide(idx);
+
+            // update text (do it immediately, animation plays after fade)
+            setText(idx);
+
+            // play animation after slide starts changing
+            playTextAnimation();
+
+            // restart auto if user clicked
+            if (userAction) restartAuto();
+        }
+
+        function next(userAction = false) { goTo(idx + 1, userAction); }
+        function prev(userAction = false) { goTo(idx - 1, userAction); }
+
+        function restartAuto() {
+            if (!slides.length) return;
+            clearInterval(timer);
+            timer = setInterval(() => next(false), AUTO_MS);
+        }
+
+        // ------- Start -------
+        const hasHeroSlider = slides.length && dotsWrap && prevBtn && nextBtn && badge && title && desc && cta;
+
+        if (hasHeroSlider) {
+            setSlideBg();
+            initDots();
+            resetTextState();
+
+            [badge, title, desc, cta].forEach((el) => {
+                el.classList.add("transition-all", "duration-700", "ease-out");
+            });
+
+            goTo(0);
+            restartAuto();
+
+            prevBtn.addEventListener("click", () => prev(true));
+            nextBtn.addEventListener("click", () => next(true));
+        }
+
+        if (testimonialTrack && testimonialPrev && testimonialNext) {
+            const testimonialStep = () => Math.min(testimonialTrack.clientWidth * 0.9, 460);
+
+            testimonialPrev.addEventListener("click", () => {
+                testimonialTrack.scrollBy({ left: -testimonialStep(), behavior: "smooth" });
+            });
+
+            testimonialNext.addEventListener("click", () => {
+                testimonialTrack.scrollBy({ left: testimonialStep(), behavior: "smooth" });
+            });
+        }
+
+        if (faqTriggers.length) {
+            faqTriggers.forEach((trigger) => {
+                trigger.addEventListener("click", () => {
+                    const targetId = trigger.getAttribute("data-faq-target");
+                    const target = document.getElementById(targetId);
+                    const icon = trigger.querySelector("[data-faq-icon]");
+                    if (!target || !icon) return;
+
+                    const willOpen = target.classList.contains("hidden");
+
+                    faqTriggers.forEach((btn) => {
+                        const id = btn.getAttribute("data-faq-target");
+                        const panel = id ? document.getElementById(id) : null;
+                        const btnIcon = btn.querySelector("[data-faq-icon]");
+                        if (!panel || !btnIcon) return;
+                        panel.classList.add("hidden");
+                        btnIcon.textContent = "+";
+                    });
+
+                    if (willOpen) {
+                        target.classList.remove("hidden");
+                        icon.textContent = "-";
+                    }
+                });
+            });
+        }
+
+        if (mobileMenuOpenBtn && mobileMenuCloseBtn && mobileMenuOverlay && mobileMenuPanel && mobileMenuBackdrop) {
+            const openMobileMenu = () => {
+                mobileMenuOverlay.classList.remove("pointer-events-none", "opacity-0");
+                mobileMenuOverlay.classList.add("opacity-100");
+                requestAnimationFrame(() => {
+                    mobileMenuPanel.classList.remove("translate-x-full");
+                });
+                document.body.classList.add("overflow-hidden");
+            };
+
+            const closeMobileMenu = () => {
+                mobileMenuPanel.classList.add("translate-x-full");
+                mobileMenuOverlay.classList.remove("opacity-100");
+                mobileMenuOverlay.classList.add("opacity-0");
+                setTimeout(() => {
+                    mobileMenuOverlay.classList.add("pointer-events-none");
+                }, 300);
+                document.body.classList.remove("overflow-hidden");
+            };
+
+            mobileMenuOpenBtn.addEventListener("click", openMobileMenu);
+            mobileMenuCloseBtn.addEventListener("click", closeMobileMenu);
+            mobileMenuBackdrop.addEventListener("click", closeMobileMenu);
+
+            mobileMenuLinks.forEach((link) => {
+                link.addEventListener("click", closeMobileMenu);
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") closeMobileMenu();
+            });
+        }
+
+        if (window.AOS) {
+            AOS.init({
+                duration: 850,
+                easing: "ease-out-cubic",
+                once: false,
+                mirror: true,
+                offset: 70
+            });
+        }
+    </script>
+
+    <div class="quick-actions" aria-label="Quick contact actions">
+        <a href="{{ site_settings.quick_action_email_url }}" class="quick-actions-item qa-email" aria-label="Email us">
+            <i class="fa-solid fa-envelope"></i>
+        </a>
+        <a href="{{ site_settings.quick_action_whatsapp_url }}" class="quick-actions-item qa-whatsapp"
+            aria-label="Chat on WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
+        <a href="{{ site_settings.quick_action_contact_url }}" class="quick-actions-toggle" aria-label="Contact options">
+            <i class="fa-solid fa-message"></i>
+        </a>
+    </div>
+{% endblock %}
+
+
+
+
+
+

@@ -1,0 +1,89 @@
+{% extends "cms/base.html" %}
+
+{% block title %}<title>FAQs | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">FAQs Manager</h1>
+            <p class="mt-2 text-slate-600">Manage FAQs and select which ones appear on homepage.</p>
+        </div>
+        {% if can_add_faq %}<a href="{% url 'cms:faq_create' %}" class="btn btn-neutral">Add New FAQ</a>{% endif %}
+    </div>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">All FAQs</h2>
+        <div class="mt-4 overflow-x-auto">
+            <table class="table">
+                <thead>
+                    <tr><th>Question</th><th>Order</th><th>Published</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    {% for faq in page_obj.object_list %}
+                        <tr>
+                            <td class="font-semibold text-slate-900">{{ faq.question }}</td>
+                            <td>{{ faq.order }}</td>
+                            <td>{% if faq.is_published %}Yes{% else %}No{% endif %}</td>
+                            <td>
+                                <div class="flex gap-2">
+                                    {% if can_change_faq %}<a href="{% url 'cms:faq_edit' faq.pk %}" class="btn btn-xs btn-outline">Edit</a>{% endif %}
+                                    {% if can_delete_faq %}
+                                    <form method="post" action="{% url 'cms:faq_delete' faq.pk %}" onsubmit="return confirm('Delete this FAQ?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-xs btn-error text-white">Delete</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="text-sm text-slate-600">No FAQs created yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="mt-5 flex items-center justify-center gap-2">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline">Prev</a>
+                {% endif %}
+                <span class="text-sm text-slate-600">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline">Next</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </article>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Homepage FAQ Selection</h2>
+        <p class="mt-2 text-sm text-slate-600">Control which FAQs appear on homepage and their order.</p>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home_faqs">
+            {{ home_faqs_formset.management_form }}
+            {% if home_faqs_formset.non_form_errors %}<p class="text-sm text-red-600">{{ home_faqs_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>FAQ</th><th>Order</th><th>Active</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in home_faqs_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.faq }}</td>
+                                <td>{{ form.display_order }}</td>
+                                <td>{{ form.is_active }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if can_change_home_faqs %}<button type="submit" class="btn btn-neutral mt-5">Save Home FAQs</button>{% endif %}
+        </form>
+    </article>
+</section>
+{% endblock %}

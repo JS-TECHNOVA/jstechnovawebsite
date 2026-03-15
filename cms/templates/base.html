@@ -1,0 +1,53 @@
+﻿{% extends "base.html" %}
+
+{% block title %}CMS | JSTechnova{% endblock %}
+
+{% block body_class %}min-h-screen bg-slate-100 text-slate-900{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen lg:grid lg:grid-cols-[290px_1fr]">
+    <aside class="border-r border-slate-200 bg-white px-5 py-6">
+        <a href="{% url 'cms:dashboard' %}" class="mb-8 inline-block text-xl font-bold text-slate-900">
+            JSTechnova CMS
+        </a>
+
+        <nav class="space-y-2">
+            <a href="{% url 'cms:dashboard' %}" class="block rounded-lg px-3 py-2 text-sm font-semibold {% if cms_section == 'dashboard' %}bg-slate-900 text-white{% else %}text-slate-700 hover:bg-slate-100{% endif %}">
+                Dashboard
+            </a>
+            <a href="{% url 'cms:homepage_manage' %}" class="block rounded-lg px-3 py-2 text-sm font-semibold {% if cms_section == 'homepage_manage' %}bg-slate-900 text-white{% else %}text-slate-700 hover:bg-slate-100{% endif %}">
+                Homepage
+            </a>
+            <a href="{% url 'cms:projects_manage' %}" class="block rounded-lg px-3 py-2 text-sm font-semibold {% if cms_section == 'projects_manage' %}bg-slate-900 text-white{% else %}text-slate-700 hover:bg-slate-100{% endif %}">
+                Projects
+            </a>
+            <a href="{% url 'cms:blogs_manage' %}" class="block rounded-lg px-3 py-2 text-sm font-semibold {% if cms_section == 'blogs_manage' %}bg-slate-900 text-white{% else %}text-slate-700 hover:bg-slate-100{% endif %}">
+                Blogs
+            </a>
+            <a href="{% url 'admin:index' %}" class="block rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                Django Admin
+            </a>
+        </nav>
+
+        <div class="mt-8 border-t border-slate-200 pt-6">
+            <p class="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Signed in as</p>
+            <p class="text-sm font-semibold text-slate-800">{{ request.user.username }}</p>
+            <a href="{% url 'cms:logout' %}" class="btn btn-sm btn-outline mt-4">Logout</a>
+        </div>
+    </aside>
+
+    <main class="px-4 py-6 lg:px-10">
+        {% if messages %}
+            <div class="mb-5 space-y-3">
+                {% for message in messages %}
+                    <div class="alert alert-success"><span>{{ message }}</span></div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block cms_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

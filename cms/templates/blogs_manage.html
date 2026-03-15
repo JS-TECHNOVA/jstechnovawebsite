@@ -1,0 +1,74 @@
+﻿{% extends "cms/base.html" %}
+
+{% block title %}Blogs | CMS{% endblock %}
+
+{% block cms_content %}
+<section>
+    <h1 class="text-3xl font-bold text-slate-900">Blogs Manager</h1>
+    <p class="mt-2 text-slate-600">Create/edit blog posts and manage which ones are shown on homepage.</p>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Blog Posts</h2>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="blogs">
+            {{ blogs_formset.management_form }}
+            {% if blogs_formset.non_form_errors %}<p class="text-sm text-red-600">{{ blogs_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>Title</th><th>Slug</th><th>Category</th><th>Excerpt</th><th>Image URL</th><th>Date</th><th>Comments</th><th>Details URL</th><th>Published</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in blogs_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.title }}</td>
+                                <td>{{ form.slug }}</td>
+                                <td>{{ form.category }}</td>
+                                <td>{{ form.excerpt }}</td>
+                                <td>{{ form.image_url }}</td>
+                                <td>{{ form.published_on }}</td>
+                                <td>{{ form.comment_count }}</td>
+                                <td>{{ form.details_url }}</td>
+                                <td>{{ form.is_published }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Blogs</button>
+        </form>
+    </article>
+
+    <article class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Homepage Blog Selection</h2>
+        <p class="mt-2 text-sm text-slate-600">Map blogs to home section, set display order, and mark one as featured.</p>
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="home_blogs">
+            {{ home_blogs_formset.management_form }}
+            {% if home_blogs_formset.non_form_errors %}<p class="text-sm text-red-600">{{ home_blogs_formset.non_form_errors|join:", " }}</p>{% endif %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr><th>Blog</th><th>Order</th><th>Featured</th><th>Active</th><th>Delete</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for form in home_blogs_formset %}
+                            <tr>
+                                <td>{{ form.id }}{{ form.blog }}</td>
+                                <td>{{ form.display_order }}</td>
+                                <td>{{ form.is_featured }}</td>
+                                <td>{{ form.is_active }}</td>
+                                <td>{% if form.instance.pk %}{{ form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Home Blogs</button>
+        </form>
+    </article>
+</section>
+{% endblock %}

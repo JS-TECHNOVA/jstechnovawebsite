@@ -1,0 +1,110 @@
+{% extends "cms/base.html" %}
+
+{% block title %}Header Dropdown Items | CMS{% endblock %}
+
+{% block cms_content %}
+<section>
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Dropdown Items</h1>
+            <p class="mt-2 text-slate-600">
+                Parent Menu: <span class="font-semibold text-slate-900">{{ menu_item.label|safe }}</span>
+            </p>
+        </div>
+        <a href="{% url 'cms:header_manage' %}" class="btn btn-outline">Back to Header Manage</a>
+    </div>
+
+    <article class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="text-xl font-bold text-slate-900">Manage Child Menu Items</h2>
+        <p class="mt-2 text-sm text-slate-600">
+            Each child supports icon class, label, little text, link, order, and active status.
+        </p>
+        {% if not menu_item.show_chevron %}
+            <div class="alert mt-4 alert-warning">
+                <span>This parent menu has chevron disabled. Enable it in Header Manage to show dropdown on site.</span>
+            </div>
+        {% endif %}
+
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            {{ formset.management_form }}
+
+            <datalist id="fa-icon-options">
+                <option value="fa-solid fa-code"></option>
+                <option value="fa-solid fa-globe"></option>
+                <option value="fa-solid fa-mobile-screen-button"></option>
+                <option value="fa-solid fa-bullhorn"></option>
+                <option value="fa-solid fa-robot"></option>
+                <option value="fa-solid fa-layer-group"></option>
+                <option value="fa-solid fa-palette"></option>
+                <option value="fa-solid fa-arrow-trend-up"></option>
+                <option value="fa-solid fa-circle-info"></option>
+                <option value="fa-solid fa-briefcase"></option>
+                <option value="fa-solid fa-chart-line"></option>
+            </datalist>
+
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Icon</th>
+                            <th>Label</th>
+                            <th>Description</th>
+                            <th>Link</th>
+                            <th>Order</th>
+                            <th>Active</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for child_form in formset %}
+                            <tr>
+                                <td class="min-w-[220px]">
+                                    {{ child_form.id }}
+                                    <div class="flex items-center gap-3">
+                                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-800 child-icon-preview">
+                                            <i class="{{ child_form.instance.icon_class|default:'fa-solid fa-circle' }}"></i>
+                                        </span>
+                                        <div class="w-full">
+                                            {{ child_form.icon_class }}
+                                            {% if child_form.icon_class.help_text %}
+                                                <p class="mt-1 text-xs text-slate-500">{{ child_form.icon_class.help_text }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="min-w-[200px]">{{ child_form.label }}</td>
+                                <td class="min-w-[260px]">{{ child_form.description }}</td>
+                                <td class="min-w-[220px]">{{ child_form.link }}</td>
+                                <td class="min-w-[120px]">{{ child_form.order }}</td>
+                                <td class="min-w-[100px]">{{ child_form.is_active }}</td>
+                                <td class="min-w-[100px]">{% if child_form.instance.pk %}{{ child_form.DELETE }}{% else %}-{% endif %}</td>
+                            </tr>
+                            {% if child_form.non_field_errors %}
+                                <tr>
+                                    <td colspan="7">
+                                        <p class="text-sm text-red-600">{{ child_form.non_field_errors|join:", " }}</p>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-neutral mt-5">Save Dropdown Items</button>
+        </form>
+    </article>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+$(function () {
+    $("input[name$='-icon_class']").on("input", function () {
+        const iconClass = $(this).val() || "fa-solid fa-circle";
+        $(this).closest("td").find(".child-icon-preview i").attr("class", iconClass);
+    });
+});
+</script>
+{% endblock %}

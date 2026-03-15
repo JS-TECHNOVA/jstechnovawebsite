@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load editorjs %}
+
+{% block title %}<title>{{ seo.title }}</title>{% endblock %}
+
+{% block content %}
+    {% include 'components/TopBar.html' %}
+    {% include 'components/Header.html' %}
+
+    {% if career_page_content %}
+    <section class="relative overflow-hidden">
+        <img src="{{ career.hero_image_url }}" alt="{{ career.title }}" class="absolute inset-0 h-full w-full object-cover" />
+        <div class="absolute inset-0 bg-[#03163a]/75"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(140deg,rgba(2,18,48,0.9)_0%,rgba(3,22,58,0.62)_55%,rgba(3,22,58,0.82)_100%)]"></div>
+        <div class="container relative z-10 px-6">
+            <div class="flex h-[320px] items-center md:h-[440px]">
+                <div class="max-w-4xl text-white" data-aos="fade-up">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">{{ career_page_content.detail_badge }}</p>
+                    <h1 class="mt-4 text-4xl font-extrabold leading-[1.1] md:text-6xl">{{ career.title }}</h1>
+                    <div class="mt-5 flex flex-wrap items-center gap-2 text-sm text-slate-200">
+                        <span class="rounded-full bg-white/15 px-3 py-1">{{ career.location }}</span>
+                        <span class="rounded-full bg-white/15 px-3 py-1">{{ career.employment_type }}</span>
+                        <span class="rounded-full bg-white/15 px-3 py-1">{{ career.experience_level }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if career_page_content %}
+    <section class="section-space bg-[linear-gradient(180deg,#f4f8ff_0%,#eef4fc_100%)]">
+        <div class="container px-6">
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
+                <article class="border border-brand-200 bg-white p-6 md:p-8 lg:col-span-8" data-aos="fade-up">
+                    {% if career.overview_content.blocks %}
+                        <h2 class="text-3xl font-extrabold text-dark md:text-4xl">Role overview</h2>
+                        <div class="prose prose-slate mt-4 max-w-none text-sm leading-8 md:text-base">{{ career.overview_content|render_editorjs }}</div>
+                    {% endif %}
+
+                    {% if career.responsibilities_content.blocks %}
+                        <h3 class="{% if career.overview_content.blocks %}mt-8 {% endif %}text-2xl font-bold text-dark md:text-3xl">What you will do</h3>
+                        <div class="prose prose-slate mt-4 max-w-none text-sm leading-8 md:text-base">{{ career.responsibilities_content|render_editorjs }}</div>
+                    {% endif %}
+
+                    {% if career.requirements_content.blocks %}
+                        <h3 class="mt-8 text-2xl font-bold text-dark md:text-3xl">Requirements</h3>
+                        <div class="prose prose-slate mt-4 max-w-none text-sm leading-8 md:text-base">{{ career.requirements_content|render_editorjs }}</div>
+                    {% endif %}
+
+                    {% if career.nice_to_have_content.blocks %}
+                        <h3 class="mt-8 text-2xl font-bold text-dark md:text-3xl">Nice to have</h3>
+                        <div class="prose prose-slate mt-4 max-w-none text-sm leading-8 md:text-base">{{ career.nice_to_have_content|render_editorjs }}</div>
+                    {% endif %}
+                </article>
+
+                <aside class="space-y-5 lg:col-span-4" data-aos="fade-left">
+                    <div class="border border-brand-200 bg-white p-6 md:p-7">
+                        <h3 class="text-2xl font-bold text-dark">Role details</h3>
+                        <div class="mt-5 space-y-4 text-sm">
+                            <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-3"><span class="text-slate-500">Department</span><span class="font-semibold text-dark">{{ career.department }}</span></div>
+                            <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-3"><span class="text-slate-500">Employment</span><span class="font-semibold text-dark">{{ career.employment_type }}</span></div>
+                            <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-3"><span class="text-slate-500">Location</span><span class="font-semibold text-dark">{{ career.location }}</span></div>
+                            <div class="flex items-start justify-between gap-3 pb-1"><span class="text-slate-500">Experience</span><span class="font-semibold text-dark">{{ career.experience_level }}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="border border-brand-200 bg-white p-6 md:p-7">
+                        <h3 class="text-2xl font-bold text-dark">Apply now</h3>
+                        <p class="mt-3 text-sm leading-7 text-slate-600">Send your resume, portfolio links, and a short introduction. We will review your application and get back to you.</p>
+                        <a href="{{ career.apply_url }}" class="group/button mt-5 inline-block relative h-14 w-full cursor-pointer">
+                            <div class="relative flex h-full w-full items-center justify-between overflow-hidden rounded-full border border-gray-300 bg-dark shadow-sm transition-all duration-300 hover:shadow-md">
+                                <div class="absolute bottom-1 left-1 top-1 flex w-10 items-center justify-center rounded-full bg-indigo-600 transition-all duration-500 ease-in-out group-hover/button:w-[calc(100%-0.5rem)]">
+                                    <i class="fa-solid fa-arrow-right text-xs text-white"></i>
+                                </div>
+                                <span class="ml-14 text-sm font-semibold text-white transition-colors duration-300">Apply via email</span>
+                            </div>
+                        </a>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if career_page_content and other_careers %}
+    <section class="section-space bg-white">
+        <div class="container px-6">
+            <div class="flex items-end justify-between gap-4" data-aos="fade-up">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">More openings</p>
+                    <h2 class="mt-3 text-3xl font-extrabold text-dark md:text-5xl">Other roles you may like</h2>
+                </div>
+                <a href="{% url 'careers' %}" class="text-sm font-semibold text-dark hover:text-secondary">Back to all openings <i class="fa-solid fa-arrow-right text-xs"></i></a>
+            </div>
+            <div class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {% for other in other_careers %}
+                    <article class="border border-brand-200 bg-brand-50/50 p-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                        <h3 class="text-2xl font-bold text-dark">{{ other.title }}</h3>
+                        <p class="mt-2 text-sm text-slate-600">{{ other.location }} | {{ other.employment_type }}</p>
+                        <a href="{{ other.get_absolute_url }}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-dark">View role <i class="fa-solid fa-arrow-right text-xs"></i></a>
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% include 'components/Footer.html' %}
+
+    <div class="quick-actions" aria-label="Quick contact actions">
+        <a href="{{ site_settings.quick_action_email_url }}" class="quick-actions-item qa-email" aria-label="Email us"><i class="fa-solid fa-envelope"></i></a>
+        <a href="{{ site_settings.quick_action_whatsapp_url }}" class="quick-actions-item qa-whatsapp" aria-label="Chat on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="{{ site_settings.quick_action_contact_url }}" class="quick-actions-toggle" aria-label="Contact options"><i class="fa-solid fa-message"></i></a>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        if (window.AOS) {
+            AOS.init({ duration: 700, once: true, offset: 50, easing: "ease-out-cubic" });
+        }
+    </script>
+{% endblock %}

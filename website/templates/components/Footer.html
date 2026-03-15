@@ -1,0 +1,86 @@
+﻿<footer class="relative overflow-hidden bg-dark text-white" data-aos="fade-up">
+    <div class="pointer-events-none absolute inset-0">
+        <div
+            class="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(25,107,255,0.22),transparent_38%),linear-gradient(180deg,#03163a_0%,#02112d_100%)]">
+        </div>
+    </div>
+
+    <div class="container relative z-10 px-6">
+        <div class="grid grid-cols-1 border-x border-white/10 lg:grid-cols-12">
+            <div class="border-b border-white/10 p-8 lg:col-span-4 lg:border-b-0 lg:border-r lg:p-12">
+                <a href="/" class="inline-flex items-center gap-2 text-3xl font-bold text-white">
+                    <span class="grid h-10 w-10 place-items-center rounded-full bg-secondary text-white">
+                        <i class="fa-solid fa-link text-base"></i>
+                    </span>
+                    <span class="font-racing text-3xl font-normal">{{ site_settings.logo_text }}</span>
+                </a>
+
+                <p class="mt-6 max-w-[24ch] text-base leading-7 text-slate-300 md:text-lg">
+                    {{ site_settings.footer_newsletter_text }}
+                </p>
+
+                <form class="mt-8 flex max-w-md items-center bg-white/10 p-2">
+                    <input type="email" placeholder="Enter email"
+                        class="w-full bg-transparent px-4 py-3 text-base text-white placeholder:text-slate-300 outline-none" />
+                    <button type="submit"
+                        class="grid shrink-0 h-11 w-11 place-items-center rounded-full bg-secondary text-white">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="relative p-8 lg:col-span-8 lg:p-12">
+                <div class="border-b border-white/10 pb-10">
+                    <a href="{{ site_settings.quote_button_url }}" class="inline-flex items-center gap-4">
+                        <h2 class="text-4xl font-extrabold leading-[1.1] text-white md:text-6xl">
+                            {{ site_settings.footer_cta_title }}
+                        </h2>
+                        <span
+                            class="grid shrink-0 size-16 place-items-center rounded-full bg-secondary text-white">
+                            <i class="fa-solid fa-arrow-right text-xl"></i>
+                        </span>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 gap-8 py-10 md:grid-cols-3">
+                    <div class="col-span-2">
+                        <p class="text-sm text-slate-400">{{ site_settings.footer_address_label }}</p>
+                        <p class="mt-3 text-xl leading-8 text-slate-200 lg:whitespace-nowrap">
+                            {{ site_settings.footer_address }}
+                        </p>
+                        <a href="tel:{{ site_settings.footer_phone }}" class="mt-4 block text-2xl font-semibold text-white">
+                            {{ site_settings.footer_phone }}
+                        </a>
+                    </div>
+
+                    <div>
+                        <p class="text-2xl font-semibold text-white">Follow Us:</p>
+                        <div class="mt-5 flex items-center gap-3">
+                            {% for social in footer_social_links %}
+                                <a href="{{ social.url }}"
+                                    class="grid h-10 w-10 place-items-center rounded-full bg-white/20 text-white transition hover:bg-secondary" aria-label="{{ social.label }}"><i
+                                        class="{{ social.icon_class }}"></i></a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div
+            class="flex flex-col items-start justify-between gap-4 bg-white/10 px-6 py-5 text-sm text-slate-300 md:flex-row md:items-center">
+            <p class="inline-flex items-center gap-2">
+                <i class="fa-solid fa-shield-heart text-secondary"></i>
+                {{ site_settings.footer_trust_text }}
+            </p>
+            <p>{{ site_settings.footer_copyright_text }}</p>
+            <p>
+                <a href="{{ site_settings.footer_policy_url }}" class="hover:text-white">{{ site_settings.footer_policy_text }}</a>
+                <span class="mx-2">•</span>
+                <a href="{{ site_settings.footer_terms_url }}" class="hover:text-white">{{ site_settings.footer_terms_text }}</a>
+            </p>
+        </div>
+    </div>
+</footer>
+

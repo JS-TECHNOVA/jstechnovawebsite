@@ -1,0 +1,126 @@
+{% extends "cms/base.html" %}
+
+{% block title %}<title>{% if mode == 'edit' %}Edit Career{% else %}New Career{% endif %} | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="max-w-5xl">
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">{% if mode == 'edit' %}Edit Career Opening{% else %}Create Career Opening{% endif %}</h1>
+            <p class="mt-2 text-slate-600">Manage the overview and requirement sections with Editor.js, including image uploads.</p>
+        </div>
+        <a href="{% url 'cms:careers_manage' %}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">Back to careers</a>
+    </div>
+
+    <form method="post" id="careerEditorForm" class="space-y-6 rounded-[32px] bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        {% csrf_token %}
+        {{ form.overview }}
+        {{ form.overview_json }}
+        {{ form.responsibilities_text }}
+        {{ form.responsibilities_json }}
+        {{ form.requirements_text }}
+        {{ form.requirements_json }}
+        {{ form.nice_to_have_text }}
+        {{ form.nice_to_have_json }}
+        <div class="grid gap-4 md:grid-cols-2">
+            {% for field in form %}
+                {% if field.name not in seo_field_names and field.name != 'overview' and field.name != 'overview_json' and field.name != 'responsibilities_text' and field.name != 'responsibilities_json' and field.name != 'requirements_text' and field.name != 'requirements_json' and field.name != 'nice_to_have_text' and field.name != 'nice_to_have_json' %}
+                <div class="{% if field.name == 'apply_url' %}md:col-span-2{% endif %}">
+                    <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <section class="space-y-5 rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Role Content</p>
+                <h2 class="mt-2 text-xl font-black text-slate-900">Overview</h2>
+            </div>
+            <div id="careerOverviewEditor" class="min-h-[260px] rounded-[24px] border border-slate-200 bg-white p-4"></div>
+        </section>
+
+        <div class="grid gap-5 lg:grid-cols-3">
+            <section class="space-y-4 rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Section One</p>
+                    <h2 class="mt-2 text-lg font-black text-slate-900">Responsibilities</h2>
+                </div>
+                <div id="careerResponsibilitiesEditor" class="min-h-[220px] rounded-[24px] border border-slate-200 bg-white p-4"></div>
+            </section>
+
+            <section class="space-y-4 rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Section Two</p>
+                    <h2 class="mt-2 text-lg font-black text-slate-900">Requirements</h2>
+                </div>
+                <div id="careerRequirementsEditor" class="min-h-[220px] rounded-[24px] border border-slate-200 bg-white p-4"></div>
+            </section>
+
+            <section class="space-y-4 rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Section Three</p>
+                    <h2 class="mt-2 text-lg font-black text-slate-900">Nice to Have</h2>
+                </div>
+                <div id="careerNiceToHaveEditor" class="min-h-[220px] rounded-[24px] border border-slate-200 bg-white p-4"></div>
+            </section>
+        </div>
+
+        <section class="rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-5">
+            <div class="mb-4 flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-600">Search Metadata</p>
+                    <h2 class="mt-2 text-xl font-black text-slate-900">Career SEO</h2>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Meta / OG / Schema</span>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in form %}
+                    {% if field.name in seo_field_names %}
+                        <div class="{% if field.name == 'seo_meta_description' or field.name == 'seo_og_description' or field.name == 'seo_schema_json_ld' %}md:col-span-2{% endif %}">
+                            {% include "cms/includes/form_field.html" with field=field %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+        <button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">{% if mode == 'edit' %}Update Opening{% else %}Create Opening{% endif %}</button>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% include "cms/includes/editorjs_assets.html" %}
+<script>
+(function () {
+    window.initCmsEditors({
+        formId: "careerEditorForm",
+        uploadUrl: "{% url 'cms:editorjs_image_upload' %}",
+        editors: [
+            {
+                holderId: "careerOverviewEditor",
+                inputId: "{{ form.overview_json.id_for_label }}",
+                placeholder: "Write the role overview here...",
+            },
+            {
+                holderId: "careerResponsibilitiesEditor",
+                inputId: "{{ form.responsibilities_json.id_for_label }}",
+                placeholder: "Outline responsibilities here...",
+            },
+            {
+                holderId: "careerRequirementsEditor",
+                inputId: "{{ form.requirements_json.id_for_label }}",
+                placeholder: "List requirements here...",
+            },
+            {
+                holderId: "careerNiceToHaveEditor",
+                inputId: "{{ form.nice_to_have_json.id_for_label }}",
+                placeholder: "Optional qualities and bonuses...",
+            },
+        ],
+    });
+})();
+</script>
+{% endblock %}

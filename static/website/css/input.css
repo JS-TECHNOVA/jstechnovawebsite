@@ -1,0 +1,268 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+    /* Core brand palette: JS Technova logo blue + deep navy */
+    --color-primary: #0f2a5f;
+    --color-secondary: #196bff;
+    --color-accent: #2890ff;
+    --color-dark: #03163a;
+    --color-light: #f5f8ff;
+
+    /* Brand scale for future consistent usage (bg-brand-600, text-brand-500, etc.) */
+    --color-brand-50: #edf4ff;
+    --color-brand-100: #dce9ff;
+    --color-brand-200: #c1d8ff;
+    --color-brand-300: #95bcff;
+    --color-brand-400: #629bff;
+    --color-brand-500: #2f7bff;
+    --color-brand-600: #196bff;
+    --color-brand-700: #145be6;
+    --color-brand-800: #1249b7;
+    --color-brand-900: #123f91;
+
+    /* Align existing indigo utilities to brand action color for current button markup */
+    --color-indigo-600: #196bff;
+    --color-indigo-700: #145be6;
+
+    --font-sans: "Jost", sans-serif;
+    --font-racing: "Racing Sans One", sans-serif;
+    --default-font-family: var(--font-sans);
+}
+
+@utility container {
+    @apply max-w-7xl mx-auto px-4 lg:px-2 xl:px-0.5;
+}
+
+@utility btn {
+    @apply cursor-pointer rounded-lg border border-secondary bg-secondary px-6 py-2 text-white shadow-sm transition-all hover:bg-accent hover:-translate-y-px active:translate-y-px;
+}
+
+@utility heading {
+    @apply text-4xl font-extrabold leading-[1.1] md:text-6xl;
+}
+
+@utility sub-heading {
+    @apply text-3xl font-extrabold leading-[1.1] md:text-4xl;
+}
+
+
+@utility heading-eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-secondary;
+}
+
+@utility section-space {
+    @apply py-16 md:py-24;
+}
+
+@utility section-title {
+    @apply text-3xl font-extrabold leading-[1.12] md:text-5xl;
+}
+
+@utility section-copy {
+    @apply text-sm leading-7 md:text-base;
+}
+
+@utility panel-soft {
+    @apply bg-brand-100/80;
+}
+
+@utility mobile-menu-heading {
+    @apply text-xl font-bold;
+}
+
+@utility mobile-menu-value {
+    @apply text-lg font-semibold;
+}
+
+/* CMS form primitives must be explicit CSS classes because widgets are styled in Python. */
+.cms-input,
+.cms-select,
+.cms-textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.375rem;
+    background: #fff;
+    color: #0f172a;
+    padding: 0.5rem 0.75rem;
+    outline: none;
+}
+
+.cms-input:focus,
+.cms-select:focus,
+.cms-textarea:focus {
+    border-color: #94a3b8;
+    box-shadow: 0 0 0 3px rgba(226, 232, 240, 0.9);
+}
+
+.cms-textarea {
+    min-height: 5.5rem;
+    resize: vertical;
+}
+
+.cms-checkbox {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.25rem;
+    accent-color: #196bff;
+}
+
+/* Global decorative pattern for all pages */
+body {
+    background-color: #f8fafd;
+    background-image:
+        radial-gradient(circle at 10% 10%, rgba(25, 107, 255, 0.1) 0 220px, transparent 360px),
+        radial-gradient(circle at 88% 8%, rgba(40, 144, 255, 0.08) 0 180px, transparent 340px),
+        radial-gradient(circle at 85% 84%, rgba(3, 22, 58, 0.06) 0 190px, transparent 330px),
+        linear-gradient(165deg, #fbfcfe 0%, #f3f7fc 52%, #f8fbff 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cg fill='none' stroke='%23145be6' stroke-opacity='.05' stroke-width='1'%3E%3Cpath d='M0 80H320M0 160H320M0 240H320'/%3E%3Cpath d='M80 0V320M160 0V320M240 0V320'/%3E%3C/g%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='%23196bff' fill-opacity='.07'%3E%3Ccircle cx='10' cy='10' r='1.2'/%3E%3Ccircle cx='60' cy='10' r='1.2'/%3E%3Ccircle cx='110' cy='10' r='1.2'/%3E%3Ccircle cx='10' cy='60' r='1.2'/%3E%3Ccircle cx='60' cy='60' r='1.2'/%3E%3Ccircle cx='110' cy='60' r='1.2'/%3E%3Ccircle cx='10' cy='110' r='1.2'/%3E%3Ccircle cx='60' cy='110' r='1.2'/%3E%3Ccircle cx='110' cy='110' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:
+        auto,
+        auto,
+        auto,
+        auto,
+        320px 320px,
+        120px 120px;
+    background-position:
+        0 0,
+        100% 0,
+        100% 100%,
+        0 0,
+        0 0,
+        0 0;
+    background-attachment: scroll;
+}
+
+@media (max-width: 768px) {
+    body {
+        background-size:
+            auto,
+            auto,
+            auto,
+            auto,
+            260px 260px,
+            100px 100px;
+        background-position:
+            0 0,
+            100% 0,
+            100% 100%,
+            0 0,
+            0 0,
+            0 0;
+    }
+}
+
+/* Branded global scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #055dff #eaf1fb;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, #eef4ff 0%, #e6eefb 100%);
+    border-left: 1px solid #d7e4fb;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8cb2ff 0%, #5f93ff 55%, #3a79ff 100%);
+    border: 2px solid #eaf1fb;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px rgba(3, 22, 58, 0.08);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #7ea8ff 0%, #4f87ff 55%, #2f71ff 100%);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, #6e9dff 0%, #3f7eff 55%, #2268ff 100%);
+}
+
+::-webkit-scrollbar-corner {
+    background: #eaf1fb;
+}
+
+.hero-shape-1 {
+    border-radius: 68% 32% 66% 34% / 46% 56% 44% 54%;
+}
+
+/* Floating quick action buttons */
+.quick-actions {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    width: 8.5rem;
+    height: 8.5rem;
+    z-index: 70;
+}
+
+.quick-actions-item,
+.quick-actions-toggle {
+    position: absolute;
+    right: 0.25rem;
+    bottom: 0.25rem;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    box-shadow: 0 12px 28px rgba(3, 22, 58, 0.22);
+    transition: transform 0.35s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quick-actions-toggle {
+    z-index: 2;
+    color: #fff;
+    background: linear-gradient(145deg, #2f7bff 0%, #196bff 55%, #145be6 100%);
+}
+
+.quick-actions-toggle:hover {
+    box-shadow: 0 14px 30px rgba(25, 107, 255, 0.42);
+}
+
+.quick-actions-item {
+    z-index: 1;
+    background: #fff;
+    border: 1px solid #c1d8ff;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(0, 0) scale(0.62);
+}
+
+.quick-actions .qa-whatsapp {
+    color: #22c55e;
+}
+
+.quick-actions .qa-email {
+    color: #196bff;
+}
+
+.quick-actions:hover .quick-actions-item,
+.quick-actions:focus-within .quick-actions-item {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.quick-actions:hover .qa-whatsapp,
+.quick-actions:focus-within .qa-whatsapp {
+    transform: translate(-0.75rem, -4.6rem) scale(1);
+}
+
+.quick-actions:hover .qa-email,
+.quick-actions:focus-within .qa-email {
+    transform: translate(-4.4rem, -1.2rem) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quick-actions-item,
+    .quick-actions-toggle {
+        transition: none;
+    }
+}

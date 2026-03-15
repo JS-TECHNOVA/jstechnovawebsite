@@ -1,0 +1,203 @@
+{% extends "cms/base.html" %}
+
+{% block title %}<title>Careers | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="space-y-6">
+    <article class="relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(135deg,#03163a_0%,#0d2457_60%,#1657db_100%)] px-6 py-7 text-white shadow-[0_30px_80px_rgba(3,22,58,0.28)] md:px-8">
+        <div class="absolute -right-14 -top-20 h-60 w-60 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.24)_0%,rgba(255,255,255,0)_72%)]"></div>
+        <div class="absolute -bottom-44 -left-24 h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.36)_0%,rgba(59,130,246,0)_70%)]"></div>
+        <div class="relative z-10 flex flex-wrap items-end justify-between gap-5">
+            <div>
+                <span class="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-white/90"><i class="fa-solid fa-user-group"></i> Hiring Pipeline</span>
+                <h1 class="mt-4 text-4xl font-black tracking-tight">Careers Manager</h1>
+                <p class="mt-4 max-w-[58ch] text-sm leading-7 text-blue-50/78">Manage careers-page messaging, benefits, and all active openings with a cleaner visual hiring board.</p>
+            </div>
+            {% if can_add_career %}<a href="{% url 'cms:career_create' %}" class="btn btn-neutral">Add New Opening</a>{% endif %}
+        </div>
+    </article>
+
+    <div class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <article class="rounded-[28px] border border-slate-200/70 bg-white/90 px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900">Careers Page Content</h2>
+                    <p class="mt-2 text-sm text-slate-600">High-level careers page copy only. Opening details now come from each role editor.</p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Simplified</span>
+            </div>
+            <form method="post" class="mt-5 space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="career_page">
+
+                <section class="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Hero</p>
+                        <h3 class="mt-1 text-lg font-black text-slate-900">Top section</h3>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        {% include "cms/includes/form_field.html" with field=career_page_form.hero_title %}
+                        {% include "cms/includes/form_field.html" with field=career_page_form.hero_image_url %}
+                        {% include "cms/includes/form_field.html" with field=career_page_form.intro_badge %}
+                        {% include "cms/includes/form_field.html" with field=career_page_form.intro_title %}
+                        <div class="md:col-span-2">{% include "cms/includes/form_field.html" with field=career_page_form.intro_description %}</div>
+                    </div>
+                </section>
+
+                <section class="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Openings List</p>
+                        <h3 class="mt-1 text-lg font-black text-slate-900">Listing section</h3>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        {% include "cms/includes/form_field.html" with field=career_page_form.openings_badge %}
+                        {% include "cms/includes/form_field.html" with field=career_page_form.openings_title %}
+                        {% include "cms/includes/form_field.html" with field=career_page_form.filter_all_label %}
+                        {% include "cms/includes/form_field.html" with field=career_page_form.listing_cta_text %}
+                        <div class="md:col-span-2">{% include "cms/includes/form_field.html" with field=career_page_form.empty_state_text %}</div>
+                        {% include "cms/includes/form_field.html" with field=career_page_form.detail_badge %}
+                    </div>
+                </section>
+
+                <section class="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Bottom CTA</p>
+                        <h3 class="mt-1 text-lg font-black text-slate-900">Careers call to action</h3>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        {% include "cms/includes/form_field.html" with field=career_page_form.cta_badge %}
+                        {% include "cms/includes/form_field.html" with field=career_page_form.cta_title %}
+                        <div class="md:col-span-2">{% include "cms/includes/form_field.html" with field=career_page_form.cta_description %}</div>
+                        {% include "cms/includes/form_field.html" with field=career_page_form.cta_button_text %}
+                        {% include "cms/includes/form_field.html" with field=career_page_form.cta_button_url %}
+                    </div>
+                </section>
+
+                {% if can_change_career_page %}<button type="submit" class="btn btn-neutral">Save Careers Page</button>{% endif %}
+            </form>
+        </article>
+
+        <article class="rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.06)]">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-blue-600">Search Metadata</p>
+                    <h2 class="mt-2 text-2xl font-black text-slate-900">Careers SEO</h2>
+                    <p class="mt-2 text-sm text-slate-600">Meta, social sharing, and schema settings for the careers listing page.</p>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Meta / OG / Schema</span>
+            </div>
+            <form method="post" class="mt-5 space-y-5">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="career_page">
+                <div class="grid gap-4 md:grid-cols-2">
+                    {% for field in career_page_form %}
+                        {% if field.name in seo_field_names %}
+                            <div class="{% if field.name == 'seo_meta_description' or field.name == 'seo_og_description' or field.name == 'seo_schema_json_ld' %}md:col-span-2{% endif %}">
+                                {% include "cms/includes/form_field.html" with field=field %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% if can_change_career_page %}<button type="submit" class="btn btn-neutral">Save Careers SEO</button>{% endif %}
+            </form>
+        </article>
+    </div>
+
+    <article class="rounded-[28px] border border-slate-200/70 bg-white/90 px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+        <h2 class="text-2xl font-black text-slate-900">Career Benefits</h2>
+        <form method="post" class="mt-5 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="benefits">
+            {{ career_benefits_formset.management_form }}
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {% for form in career_benefits_formset %}
+                    <article class="space-y-3 rounded-[20px] border border-slate-200/70 bg-slate-50/90 p-4">
+                        {{ form.id }}
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Order</label>
+                            {{ form.order }}
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Title</label>
+                            {{ form.title }}
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">Description</label>
+                            {{ form.description }}
+                        </div>
+                        {% if form.instance.pk %}
+                            <label class="flex items-center gap-2 text-sm font-medium text-slate-500">{{ form.DELETE }} Remove benefit</label>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+            {% if can_change_benefits %}<button type="submit" class="btn btn-neutral">Save Career Benefits</button>{% endif %}
+        </form>
+    </article>
+
+    <article class="rounded-[28px] border border-slate-200/70 bg-white/90 px-6 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900">All Openings</h2>
+                <p class="mt-2 text-sm text-slate-600">Visual board for open roles with department, location, and publish status at a glance.</p>
+            </div>
+            <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-700">{{ paginator.count }} total</span>
+        </div>
+
+        {% if page_obj.object_list %}
+            <div class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {% for career in page_obj.object_list %}
+                    <article class="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_16px_44px_rgba(15,23,42,0.06)]">
+                        <div class="relative h-[180px] overflow-hidden bg-[linear-gradient(135deg,#dbeafe_0%,#eff6ff_100%)]">
+                            {% if career.hero_image_url %}
+                                <img src="{{ career.hero_image_url }}" alt="{{ career.title }}" class="h-full w-full object-cover" />
+                            {% else %}
+                                <div class="flex h-full items-center justify-center text-3xl text-blue-700"><i class="fa-regular fa-image"></i></div>
+                            {% endif %}
+                        </div>
+                        <div class="p-5">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-700">{{ career.department }}</span>
+                                {% if career.is_published %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-700">Published</span>
+                                {% else %}
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-amber-700">Draft</span>
+                                {% endif %}
+                            </div>
+                            <h3 class="mt-4 text-2xl font-black text-slate-900">{{ career.title }}</h3>
+                            <p class="mt-2 text-sm text-slate-500">/{{ career.slug }}/</p>
+                            <p class="mt-4 text-sm leading-7 text-slate-600">{{ career.summary }}</p>
+                            <p class="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{{ career.location }} | {{ career.employment_type }}</p>
+                            <div class="mt-5 flex gap-2">
+                                {% if can_change_career %}<a href="{% url 'cms:career_edit' career.pk %}" class="btn btn-sm btn-outline">Edit</a>{% endif %}
+                                {% if can_delete_career %}
+                                <form method="post" action="{% url 'cms:career_delete' career.pk %}" onsubmit="return confirm('Delete this opening?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-error text-white">Delete</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center text-slate-600">No openings created yet.</div>
+        {% endif %}
+
+        {% if page_obj.has_other_pages %}
+            <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+                {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline">Prev</a>{% endif %}
+                {% for num in paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="inline-flex h-10 min-w-10 items-center justify-center rounded-full bg-slate-900 px-3 text-sm font-semibold text-white">{{ num }}</span>
+                    {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                        <a href="?page={{ num }}" class="inline-flex h-10 min-w-10 items-center justify-center rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline">Next</a>{% endif %}
+            </div>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

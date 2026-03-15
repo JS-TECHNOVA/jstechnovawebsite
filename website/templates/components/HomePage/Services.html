@@ -1,0 +1,96 @@
+﻿<section class="section-space relative overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#edf3fb_100%)]">
+    <div class="pointer-events-none absolute inset-0">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_85%_12%,rgba(25,107,255,0.08),transparent_32%)]"></div>
+    </div>
+    <div class="container relative z-10 px-6" data-aos="fade-up">
+        <div class="flex flex-col gap-10">
+            <div class="grid grid-cols-1 items-end gap-8 lg:grid-cols-12">
+                <div class="lg:col-span-8">
+                    <p class="heading-eyebrow">
+                        <span>•</span>
+                        {{ service_page_content.home_badge }}
+                        <span>•</span>
+                    </p>
+                    <h2 class="section-title mt-4 max-w-[18ch] text-dark">{{ service_page_content.home_title }}</h2>
+                </div>
+
+                <div class="lg:col-span-4 lg:text-right">
+                    <div class="inline-flex items-center gap-2 rounded-full bg-brand-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-secondary">
+                        <i class="fa-solid fa-bolt"></i>
+                        {{ service_page_content.home_benefit_badge }}
+                    </div>
+                    <p class="mt-3 text-sm leading-7 text-slate-600 md:text-base">{{ service_page_content.home_benefit_text }}</p>
+                </div>
+            </div>
+
+            <div class="overflow-hidden rounded-2xl border border-slate-300 bg-white shadow">
+                {% for item in home_services %}
+                    <article data-aos="fade-up" data-aos-delay="{{ forloop.counter }}20"
+                        class="group relative isolate overflow-hidden {% if not forloop.last %}border-b border-slate-300/80{% endif %} bg-[#f6f7f9] text-dark transition-colors duration-300 ease-out hover:text-white">
+                        <div class="absolute inset-0 overflow-hidden">
+                            <img src="{{ item.service.image_url }}" alt="{{ item.service.title }}" loading="eager" decoding="async" fetchpriority="high" data-service-hover-image
+                                class="h-full w-full scale-[1.03] transform-gpu object-cover opacity-0 transition-[opacity,transform] duration-300 ease-out will-change-transform group-hover:scale-100 group-hover:opacity-100" />
+                        </div>
+                        <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,22,58,0.92)_0%,rgba(3,22,58,0.78)_42%,rgba(3,22,58,0.68)_72%,rgba(3,22,58,0.8)_100%)] opacity-0 transition-opacity duration-300 ease-out will-change-[opacity] group-hover:opacity-100"></div>
+
+                        <div class="relative grid min-h-[176px] grid-cols-1 gap-8 px-8 py-10 md:min-h-[188px] md:grid-cols-12 md:items-center md:px-12 md:py-11">
+                            <div class="transition-transform duration-300 ease-out group-hover:translate-x-1 md:col-span-5 lg:col-span-4">
+                                <h3 class="text-2xl font-extrabold leading-[1.15] text-dark transition-colors duration-300 group-hover:text-white md:text-3xl">
+                                    {{ item.service.title }}
+                                </h3>
+                            </div>
+                            <div class="transition-transform duration-300 ease-out group-hover:translate-x-1 md:col-span-5 lg:col-span-5">
+                                <p class="text-sm leading-7 text-slate-700 transition-colors duration-300 group-hover:text-white/90 md:text-base">
+                                    {{ item.service.summary }}
+                                </p>
+                            </div>
+                            <div class="transition-transform duration-300 ease-out group-hover:translate-x-1 md:col-span-2 lg:col-span-3 md:text-right">
+                                <a href="{{ item.service.get_absolute_url }}"
+                                    class="inline-flex items-center gap-2 text-sm font-semibold text-dark transition-colors duration-300 group-hover:text-white">
+                                    {{ item.service.cta_text }}
+                                    <i class="fa-solid fa-angle-right text-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <article class="px-8 py-10 text-slate-600">
+                        No active home services configured yet.
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const serviceImages = Array.from(document.querySelectorAll("[data-service-hover-image]"));
+        if (!serviceImages.length) return;
+
+        const warmImages = function () {
+            serviceImages.forEach(function (img) {
+                const source = img.currentSrc || img.src;
+                if (!source) return;
+
+                if (typeof img.decode === "function") {
+                    img.decode().catch(function () {});
+                }
+
+                const preloader = new Image();
+                preloader.decoding = "async";
+                preloader.fetchPriority = "high";
+                preloader.src = source;
+                if (typeof preloader.decode === "function") {
+                    preloader.decode().catch(function () {});
+                }
+            });
+        };
+
+        if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(warmImages, { timeout: 1200 });
+        } else {
+            window.setTimeout(warmImages, 180);
+        }
+    });
+</script>

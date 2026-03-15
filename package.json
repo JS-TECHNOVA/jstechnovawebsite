@@ -1,0 +1,21 @@
+{
+	"name": "jstechnova",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"css": "npx @tailwindcss/cli -i ./static/website/css/input.css -o ./static/website/css/output.css --watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"dependencies": {
+		"@tailwindcss/cli": "^4.1.18",
+		"tailwindcss": "^4.1.18"
+	},
+	"devDependencies": {
+		"@tailwindcss/typography": "^0.5.19",
+		"daisyui": "^5.5.18"
+	}
+}

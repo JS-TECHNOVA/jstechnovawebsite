@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}
+    {% endblock %}
+    {% block title %}<title>{{ seo.title|default:"JS Technova - Web & App Development Agency" }}</title>{% endblock %}
+    {% if seo %}
+    {% if seo.meta_description %}<meta name="description" content="{{ seo.meta_description }}">{% endif %}
+    {% if seo.keywords %}<meta name="keywords" content="{{ seo.keywords }}">{% endif %}
+    {% if seo.robots %}<meta name="robots" content="{{ seo.robots }}">{% endif %}
+    {% if seo.canonical_url %}<link rel="canonical" href="{{ seo.canonical_url }}">{% endif %}
+    {% if seo.og_title %}<meta property="og:title" content="{{ seo.og_title }}">{% endif %}
+    {% if seo.og_description %}<meta property="og:description" content="{{ seo.og_description }}">{% endif %}
+    {% if seo.og_url %}<meta property="og:url" content="{{ seo.og_url }}">{% endif %}
+    {% if seo.og_type %}<meta property="og:type" content="{{ seo.og_type }}">{% endif %}
+    {% if seo.site_name %}<meta property="og:site_name" content="{{ seo.site_name }}">{% endif %}
+    {% if seo.og_image_url %}<meta property="og:image" content="{{ seo.og_image_url }}">{% endif %}
+    {% if seo.twitter_card %}<meta name="twitter:card" content="{{ seo.twitter_card }}">{% endif %}
+    {% if seo.twitter_title %}<meta name="twitter:title" content="{{ seo.twitter_title }}">{% endif %}
+    {% if seo.twitter_description %}<meta name="twitter:description" content="{{ seo.twitter_description }}">{% endif %}
+    {% if seo.twitter_image_url %}<meta name="twitter:image" content="{{ seo.twitter_image_url }}">{% endif %}
+    {% if seo.json_ld %}
+    <script type="application/ld+json">{{ seo.json_ld|safe }}</script>
+    {% endif %}
+    {% endif %}
+    <link rel="stylesheet" href="{% static 'website/css/output.css' %}" />
+    <link rel="stylesheet" href="{% static 'common/css/aos2.3.css' %}" />
+    <style>
+        html:not(.aos-ready) [data-aos] {
+            opacity: 1 !important;
+            transform: none !important;
+            transition-property: none !important;
+        }
+
+        html.site-loader-active,
+        html.site-loader-active body {
+            overflow: hidden;
+        }
+
+        .site-loader-ring {
+            animation: site-loader-spin 8s linear infinite;
+        }
+
+        .site-loader-ring-reverse {
+            animation: site-loader-spin-reverse 10s linear infinite;
+        }
+
+        .site-loader-pulse {
+            animation: site-loader-pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes site-loader-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes site-loader-spin-reverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        @keyframes site-loader-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.65; }
+            50% { transform: scale(1.14); opacity: 1; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@100..900&family=Racing+Sans+One&display=swap"
+        rel="stylesheet">
+    <script src="https://kit.fontawesome.com/241f095c7b.js" crossorigin="anonymous"></script>
+    <script src="{% static 'common/js/jquery4.0.js' %}" crossorigin="anonymous"></script>
+
+</head>
+<body id="top" class="{% block body_class %}antialiased bg-white selection:bg-secondary selection:text-white{% endblock %}">
+    {% if request.path|slice:":5" != "/cms/" and request.path|slice:":7" != "/admin/" %}
+    <div id="siteLoader" class="fixed inset-0 z-[200] bg-[#021230] text-white transition duration-700 ease-out" aria-hidden="true">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.18),transparent_38%),linear-gradient(180deg,#021230_0%,#03163a_100%)]"></div>
+        <div class="relative z-10 flex min-h-screen items-center justify-center px-6">
+            <div class="w-full max-w-sm text-center">
+                <div class="mx-auto flex h-44 w-44 items-center justify-center rounded-full">
+                    <div class="site-loader-ring absolute h-44 w-44 rounded-full border border-white/10 border-t-blue-400"></div>
+                    <div class="site-loader-ring-reverse absolute h-32 w-32 rounded-full border border-white/10 border-r-white/40"></div>
+                    <div class="relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-[0_18px_40px_rgba(37,99,235,0.35)]">
+                        <img src="{% static 'website/media/icons/LogoIcon.png' %}" alt="JS Technova" class="h-10 w-10 object-contain" />
+                    </div>
+                </div>
+                <p class="mt-10 text-sm font-semibold uppercase tracking-[0.6em] text-blue-100">Loading Experience</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% block header %}{% endblock %}
+    {% block content %}{% endblock %}
+</body>
+{% block scripts %}
+<script src="{% static 'common/js/aos2.3.js' %}" crossorigin="anonymous"></script>
+<script>
+    (function () {
+        const loader = document.getElementById("siteLoader");
+        if (!loader) return;
+
+        const html = document.documentElement;
+        const startedAt = Date.now();
+        const minimumVisibleMs = 850;
+
+        html.classList.add("site-loader-active");
+
+        function hideLoader(immediate) {
+            if (!loader || loader.dataset.hidden === "true") return;
+            loader.dataset.hidden = "true";
+            const remaining = Math.max(0, minimumVisibleMs - (Date.now() - startedAt));
+            window.setTimeout(function () {
+                loader.classList.add("opacity-0", "pointer-events-none");
+                html.classList.remove("site-loader-active");
+                window.setTimeout(function () {
+                    if (loader.parentNode) loader.remove();
+                }, immediate ? 0 : 700);
+            }, immediate ? 0 : remaining);
+        }
+
+        window.addEventListener("load", function () {
+            hideLoader(false);
+        }, { once: true });
+
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) hideLoader(true);
+        });
+
+        window.setTimeout(function () {
+            hideLoader(false);
+        }, 4000);
+    })();
+
+    window.initSiteAOS = function (config) {
+        document.documentElement.classList.add("aos-ready");
+        if (!window.AOS) return;
+        AOS.init(Object.assign({
+            duration: 700,
+            once: true,
+            offset: 50,
+            easing: "ease-out-cubic"
+        }, config || {}));
+    };
+
+    window.initSiteAOS();
+</script>
+<script src="{% static 'website/js/index.js' %}" crossorigin="anonymous"></script>
+{% endblock %}
+</html>

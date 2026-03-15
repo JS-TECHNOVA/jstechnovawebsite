@@ -1,0 +1,64 @@
+{% extends "cms/base.html" %}
+
+{% block title %}<title>{% if mode == 'edit' %}Edit Testimonial{% else %}New Testimonial{% endif %} | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="max-w-5xl">
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">{% if mode == 'edit' %}Edit Testimonial{% else %}Create Testimonial{% endif %}</h1>
+            <p class="mt-2 text-slate-600">Add client testimonial content for homepage display.</p>
+        </div>
+        <a href="{% url 'cms:testimonials_manage' %}" class="btn btn-outline">Back to testimonials</a>
+    </div>
+
+    <form method="post" class="space-y-5 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        {% csrf_token %}
+
+        <div class="grid gap-4 md:grid-cols-2">
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
+                {{ form.order }}
+                {% if form.order.errors %}<p class="mt-1 text-sm text-red-600">{{ form.order.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.rating.id_for_label }}">{{ form.rating.label }}</label>
+                {{ form.rating }}
+                {% if form.rating.errors %}<p class="mt-1 text-sm text-red-600">{{ form.rating.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                {{ form.name }}
+                {% if form.name.errors %}<p class="mt-1 text-sm text-red-600">{{ form.name.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.role.id_for_label }}">{{ form.role.label }}</label>
+                {{ form.role }}
+                {% if form.role.errors %}<p class="mt-1 text-sm text-red-600">{{ form.role.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>
+                {{ form.company }}
+                {% if form.company.errors %}<p class="mt-1 text-sm text-red-600">{{ form.company.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.image_url.id_for_label }}">{{ form.image_url.label }}</label>
+                {{ form.image_url }}
+                {% if form.image_url.errors %}<p class="mt-1 text-sm text-red-600">{{ form.image_url.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.quote.id_for_label }}">{{ form.quote.label }}</label>
+                {{ form.quote }}
+                {% if form.quote.errors %}<p class="mt-1 text-sm text-red-600">{{ form.quote.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700">{{ form.is_published.label }}</label>
+                {{ form.is_published }}
+                {% if form.is_published.errors %}<p class="mt-1 text-sm text-red-600">{{ form.is_published.errors|join:", " }}</p>{% endif %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-neutral">{% if mode == 'edit' %}Update Testimonial{% else %}Create Testimonial{% endif %}</button>
+    </form>
+</section>
+{% endblock %}

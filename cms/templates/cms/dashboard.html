@@ -1,0 +1,105 @@
+{% extends "cms/base.html" %}
+
+{% block title %}<title>Dashboard | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="space-y-6">
+    <article class="relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(135deg,#03163a_0%,#0d2457_60%,#1657db_100%)] px-6 py-7 text-white shadow-[0_30px_80px_rgba(3,22,58,0.28)] md:px-8 md:py-9">
+        <div class="absolute -right-14 -top-20 h-60 w-60 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.24)_0%,rgba(255,255,255,0)_72%)]"></div>
+        <div class="absolute -bottom-44 -left-24 h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.36)_0%,rgba(59,130,246,0)_70%)]"></div>
+        <div class="relative z-10 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+            <div>
+                <span class="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-white/90"><i class="fa-solid fa-sparkles"></i> Live Content Ops</span>
+                <h1 class="mt-5 max-w-[12ch] text-4xl font-black leading-[1.02] md:text-5xl">Visual control for every public page.</h1>
+                <p class="mt-5 max-w-[58ch] text-sm leading-7 text-blue-50/78 md:text-base">Manage homepage sections, publishable content, featured items, and new contact leads from one dashboard with a cleaner operational view.</p>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+                {% if perms.website.view_contactsubmission %}
+                <article class="rounded-3xl border border-white/12 bg-white/10 p-5">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-100/70">Open Inquiries</p>
+                    <p class="mt-3 text-4xl font-black">{{ contact_unresolved_count }}</p>
+                    <a href="{% url 'cms:contact_submissions_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white">Review inbox <i class="fa-solid fa-arrow-right text-xs"></i></a>
+                </article>
+                {% endif %}
+                <article class="rounded-3xl border border-white/12 bg-white/10 p-5">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-100/70">Featured Blocks</p>
+                    <p class="mt-3 text-4xl font-black">{{ home_projects_count|add:home_services_count|add:home_blogs_count }}</p>
+                    <p class="mt-4 text-sm text-blue-50/78">Active homepage project, service, and blog mappings.</p>
+                </article>
+            </div>
+        </div>
+    </article>
+
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {% if perms.website.view_heroslide or perms.website.view_homepagecontent %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">Hero Slides</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ slides_count }}</p>
+            <a href="{% url 'cms:homepage_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Manage <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+        {% if perms.website.view_service %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">Services</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ services_count }}</p>
+            <p class="mt-2 text-sm text-slate-500">{{ home_services_count }} active on homepage</p>
+            <a href="{% url 'cms:services_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Open manager <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+        {% if perms.website.view_project %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">Projects</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ projects_count }}</p>
+            <p class="mt-2 text-sm text-slate-500">{{ home_projects_count }} featured on homepage</p>
+            <a href="{% url 'cms:projects_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Open manager <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+        {% if perms.website.view_blogpost %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">Blogs</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ blogs_count }}</p>
+            <p class="mt-2 text-sm text-slate-500">{{ home_blogs_count }} mapped to homepage</p>
+            <a href="{% url 'cms:blogs_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Open manager <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+        {% if perms.website.view_careeropening %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">Careers</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ careers_count }}</p>
+            <a href="{% url 'cms:careers_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Open manager <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+        {% if perms.website.view_testimonial %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">Testimonials</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ testimonials_count }}</p>
+            <p class="mt-2 text-sm text-slate-500">{{ home_testimonials_count }} active on homepage</p>
+            <a href="{% url 'cms:testimonials_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Open manager <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+        {% if perms.website.view_faqitem %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">FAQs</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ faqs_count }}</p>
+            <p class="mt-2 text-sm text-slate-500">{{ home_faqs_count }} active on homepage</p>
+            <a href="{% url 'cms:faqs_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Open manager <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+        {% if perms.website.view_contactsubmission %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">Contact Inbox</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ contact_submissions_count }}</p>
+            <p class="mt-2 text-sm text-slate-500">{{ contact_unresolved_count }} still need review</p>
+            <a href="{% url 'cms:contact_submissions_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Open inbox <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+        {% if perms.auth.view_user %}
+        <article class="rounded-3xl border border-slate-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,248,255,0.92))] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+            <p class="text-sm font-semibold text-slate-500">Users</p>
+            <p class="mt-2 text-3xl font-black text-slate-900">{{ users_count }}</p>
+            <a href="{% url 'cms:users_manage' %}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">Manage users <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </article>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

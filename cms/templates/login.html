@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}CMS Login | JSTechnova{% endblock %}
+
+{% block body_class %}min-h-screen bg-slate-100 text-slate-900{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<main class="flex min-h-screen items-center justify-center px-4">
+    <section class="w-full max-w-md rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200">
+        <h1 class="text-2xl font-bold text-slate-900">CMS Login</h1>
+        <p class="mt-2 text-sm text-slate-600">Only admin users can access this panel.</p>
+
+        <form method="post" class="mt-6 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next|default_if_none:'' }}">
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    <span>{{ form.non_field_errors }}</span>
+                </div>
+            {% endif %}
+
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.username.id_for_label }}">Username</label>
+                <input type="text" name="username" id="{{ form.username.id_for_label }}" class="input input-bordered w-full" value="{{ form.username.value|default:'' }}" required>
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.password.id_for_label }}">Password</label>
+                <input type="password" name="password" id="{{ form.password.id_for_label }}" class="input input-bordered w-full" required>
+            </div>
+
+            <button type="submit" class="btn btn-neutral w-full">Login to CMS</button>
+        </form>
+    </section>
+</main>
+{% endblock %}

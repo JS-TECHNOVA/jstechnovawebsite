@@ -1,0 +1,103 @@
+﻿{% extends "cms/base.html" %}
+
+{% block title %}<title>{% if mode == 'edit' %}Edit Service{% else %}New Service{% endif %} | CMS</title>{% endblock %}
+
+{% block cms_content %}
+<section class="max-w-5xl">
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">{% if mode == 'edit' %}Edit Service{% else %}Create Service{% endif %}</h1>
+            <p class="mt-2 text-slate-600">Write service detail content using Editor.js JSON.</p>
+        </div>
+        <a href="{% url 'cms:services_manage' %}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">Back to services</a>
+    </div>
+
+    <form method="post" id="serviceEditorForm" class="space-y-6 rounded-[32px] bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        {% csrf_token %}
+
+        <div class="grid gap-4 md:grid-cols-2">
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                {{ form.title }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
+                {{ form.slug }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.icon_class.id_for_label }}">{{ form.icon_class.label }}</label>
+                {{ form.icon_class }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.image_url.id_for_label }}">{{ form.image_url.label }}</label>
+                {{ form.image_url }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.cta_text.id_for_label }}">{{ form.cta_text.label }}</label>
+                {{ form.cta_text }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.details_url.id_for_label }}">{{ form.details_url.label }}</label>
+                {{ form.details_url }}
+                <p class="mt-1 text-xs text-slate-500">Keep `#` to use internal service detail URL.</p>
+            </div>
+            <div class="md:col-span-2">
+                <label class="mb-1 block text-sm font-semibold text-slate-700" for="{{ form.summary.id_for_label }}">{{ form.summary.label }}</label>
+                {{ form.summary }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-semibold text-slate-700">{{ form.is_published.label }}</label>
+                {{ form.is_published }}
+            </div>
+        </div>
+
+        <section class="rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-5">
+            <div class="mb-4 flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-600">Search Metadata</p>
+                    <h2 class="mt-2 text-xl font-black text-slate-900">Service SEO</h2>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Meta / OG / Schema</span>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2">
+                {% for field in form %}
+                    {% if field.name in seo_field_names %}
+                        <div class="{% if field.name == 'seo_meta_description' or field.name == 'seo_og_description' or field.name == 'seo_schema_json_ld' %}md:col-span-2{% endif %}">
+                            {% include "cms/includes/form_field.html" with field=field %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+
+        {{ form.content_json }}
+
+        <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-700">Service Content (Editor.js)</label>
+            <div id="editorjs" class="min-h-[320px] rounded-lg border border-slate-300 bg-white p-4"></div>
+        </div>
+
+        <button type="submit" class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">{% if mode == 'edit' %}Update Service{% else %}Create Service{% endif %}</button>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% include "cms/includes/editorjs_assets.html" %}
+<script>
+(function () {
+    window.initCmsEditors({
+        formId: "serviceEditorForm",
+        uploadUrl: "{% url 'cms:editorjs_image_upload' %}",
+        editors: [
+            {
+                holderId: "editorjs",
+                inputId: "{{ form.content_json.id_for_label }}",
+                placeholder: "Write the service details here...",
+            },
+        ],
+    });
+})();
+</script>
+{% endblock %}
