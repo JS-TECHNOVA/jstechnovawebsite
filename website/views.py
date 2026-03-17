@@ -11,6 +11,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, TemplateView
+from django_ratelimit.core import is_ratelimited
 
 from .forms import ContactInquiryForm, FeedbackForm
 from .models import (
@@ -76,6 +77,26 @@ logger = logging.getLogger(__name__)
 
 
 cache_public_page = cache_page(getattr(settings, "PAGE_CACHE_SECONDS", 300))
+
+
+def _render_rate_limited_page(view, request, *, context, message):
+    messages.error(request, message)
+    return view.render_to_response(context, status=429)
+
+
+def _rate_limited_json(message):
+    return JsonResponse({"ok": False, "message": message}, status=429)
+
+
+def _is_rate_limited(request, *, group, rate):
+    return is_ratelimited(
+        request=request,
+        group=group,
+        key="ip",
+        rate=rate,
+        method=["POST"],
+        increment=True,
+    )
 
 
 def _send_contact_submission_emails(submission, site_settings):
@@ -694,6 +715,14 @@ class ContactPageView(SiteContentMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         page_content = self.get_contact_page()
         form = self.get_form(page_content, data=request.POST)
+        if _is_rate_limited(request, group="contact_form", rate=settings.CONTACT_FORM_RATE):
+            context = self.get_context_data(contact_form=form, contact_page=page_content)
+            return _render_rate_limited_page(
+                self,
+                request,
+                context=context,
+                message="Too many inquiries sent from this browser. Please wait a few minutes and try again.",
+            )
         if form.is_valid():
             submission = form.save()
             try:
@@ -742,6 +771,15 @@ class FeedbackPageView(SiteContentMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         page_content = self.get_feedback_page()
+        if _is_rate_limited(request, group="feedback_form", rate=settings.FEEDBACK_FORM_RATE):
+            form = self.get_form(page_content, data=request.POST, files=request.FILES)
+            context = self.get_context_data(feedback_form=form, feedback_page=page_content)
+            return _render_rate_limited_page(
+                self,
+                request,
+                context=context,
+                message="Too many feedback submissions were sent from this browser. Please wait a few minutes and try again.",
+            )
         form = self.get_form(page_content, data=request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
@@ -954,6 +992,8 @@ class BlogDetailView(SiteContentMixin, DetailView):
 def blog_like_view(request, slug):
     if request.method != "POST":
         return JsonResponse({"ok": False, "message": "POST required."}, status=405)
+    if _is_rate_limited(request, group="blog_like", rate=settings.BLOG_ENGAGEMENT_RATE):
+        return _rate_limited_json("Too many like requests. Please slow down and try again shortly.")
     blog = BlogPost.objects.live().filter(slug=slug).first()
     if not blog:
         return JsonResponse({"ok": False, "message": "Blog not found."}, status=404)
@@ -970,6 +1010,8 @@ def blog_like_view(request, slug):
 def blog_share_view(request, slug):
     if request.method != "POST":
         return JsonResponse({"ok": False, "message": "POST required."}, status=405)
+    if _is_rate_limited(request, group="blog_share", rate=settings.BLOG_ENGAGEMENT_RATE):
+        return _rate_limited_json("Too many share requests. Please slow down and try again shortly.")
     blog = BlogPost.objects.live().filter(slug=slug).first()
     if not blog:
         return JsonResponse({"ok": False, "message": "Blog not found."}, status=404)
@@ -986,6 +1028,8 @@ def blog_share_view(request, slug):
 def blog_read_time_view(request, slug):
     if request.method != "POST":
         return JsonResponse({"ok": False, "message": "POST required."}, status=405)
+    if _is_rate_limited(request, group="blog_read_time", rate=settings.BLOG_ENGAGEMENT_RATE):
+        return _rate_limited_json("Too many read-time updates. Please slow down and try again shortly.")
     blog = BlogPost.objects.live().filter(slug=slug).first()
     if not blog:
         return JsonResponse({"ok": False, "message": "Blog not found."}, status=404)

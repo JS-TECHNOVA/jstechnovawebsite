@@ -248,6 +248,89 @@ class StaticPageExperienceTests(TestCase):
         self.assertContains(response, "services")
 
 
+@override_settings(CONTACT_FORM_RATE="1/h", FEEDBACK_FORM_RATE="1/h", BLOG_ENGAGEMENT_RATE="1/h")
+class RateLimitTests(TestCase):
+    def test_contact_form_rate_limit_returns_429(self):
+        bootstrap_homepage_defaults()
+
+        first_response = self.client.post(
+            reverse("contact"),
+            {
+                "name": "Taylor",
+                "email": "taylor@example.com",
+                "phone": "1234567890",
+                "project_details": "Need a new project quote.",
+            },
+        )
+        second_response = self.client.post(
+            reverse("contact"),
+            {
+                "name": "Taylor",
+                "email": "taylor@example.com",
+                "phone": "1234567890",
+                "project_details": "Need a new project quote.",
+            },
+        )
+
+        self.assertEqual(first_response.status_code, 302)
+        self.assertEqual(second_response.status_code, 429)
+        self.assertContains(second_response, "Too many inquiries sent from this browser", status_code=429)
+
+    def test_feedback_form_rate_limit_returns_429(self):
+        bootstrap_homepage_defaults()
+
+        first_response = self.client.post(
+            reverse("feedback"),
+            {
+                "name": "Avery",
+                "email": "avery@example.com",
+                "feeling": "good",
+                "rating": "5",
+                "message": "Great work.",
+            },
+        )
+        second_response = self.client.post(
+            reverse("feedback"),
+            {
+                "name": "Avery",
+                "email": "avery@example.com",
+                "feeling": "good",
+                "rating": "5",
+                "message": "Great work.",
+            },
+        )
+
+        self.assertEqual(first_response.status_code, 302)
+        self.assertEqual(second_response.status_code, 429)
+        self.assertContains(
+            second_response,
+            "Too many feedback submissions were sent from this browser",
+            status_code=429,
+        )
+
+    def test_blog_like_rate_limit_returns_429_json(self):
+        bootstrap_homepage_defaults()
+        blog = BlogPost.objects.create(
+            title="Rate Limited Blog",
+            slug="rate-limited-blog",
+            category="General",
+            excerpt="Testing rate limit",
+            image_url="https://example.com/rate-limit.jpg",
+            status=BlogPost.STATUS_PUBLISHED,
+            is_published=True,
+        )
+
+        first_response = self.client.post(reverse("blog_like", kwargs={"slug": blog.slug}))
+        second_response = self.client.post(reverse("blog_like", kwargs={"slug": blog.slug}))
+
+        self.assertEqual(first_response.status_code, 200)
+        self.assertEqual(second_response.status_code, 429)
+        self.assertJSONEqual(
+            second_response.content,
+            {"ok": False, "message": "Too many like requests. Please slow down and try again shortly."},
+        )
+
+
 class BlogPageTests(TestCase):
     def test_blogs_page_is_paginated(self):
         bootstrap_homepage_defaults()

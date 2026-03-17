@@ -165,9 +165,23 @@ CACHES = {
         "OPTIONS": {
             "MAX_ENTRIES": int(os.getenv("CACHE_MAX_ENTRIES", "1000")),
         },
-    }
+    },
+    "ratelimit": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": os.getenv("RATELIMIT_CACHE_LOCATION", "jstechnova-ratelimit-cache"),
+        "TIMEOUT": int(os.getenv("CACHE_TIMEOUT", "300")),
+        "OPTIONS": {
+            "MAX_ENTRIES": int(os.getenv("RATELIMIT_CACHE_MAX_ENTRIES", "5000")),
+        },
+    },
 }
 PAGE_CACHE_SECONDS = int(os.getenv("PAGE_CACHE_SECONDS", os.getenv("CACHE_TIMEOUT", "300")))
+RATELIMIT_ENABLE = _env_bool("RATELIMIT_ENABLE", True)
+RATELIMIT_USE_CACHE = "ratelimit"
+RATELIMIT_FAIL_OPEN = True
+CONTACT_FORM_RATE = os.getenv("CONTACT_FORM_RATE", "5/10m")
+FEEDBACK_FORM_RATE = os.getenv("FEEDBACK_FORM_RATE", "5/10m")
+BLOG_ENGAGEMENT_RATE = os.getenv("BLOG_ENGAGEMENT_RATE", "60/m")
 
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
