@@ -8,11 +8,14 @@ from .models import (
     CareerOpening,
     CareerPageContent,
     ContactPageContent,
+    FeedbackPageContent,
     HomePageContent,
+    PrivacyPolicyPageContent,
     Project,
     ProjectPageContent,
     Service,
     ServicePageContent,
+    TermsAndConditionsPageContent,
 )
 
 
@@ -24,6 +27,9 @@ STATIC_VIEW_MODELS = {
     "blogs": BlogPageContent,
     "contact": ContactPageContent,
     "careers": CareerPageContent,
+    "feedback": FeedbackPageContent,
+    "privacy_policy": PrivacyPolicyPageContent,
+    "terms_and_conditions": TermsAndConditionsPageContent,
 }
 
 
@@ -32,7 +38,18 @@ class StaticViewSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return ["home", "about", "services", "projects", "blogs", "contact", "careers"]
+        return [
+            "home",
+            "about",
+            "services",
+            "projects",
+            "blogs",
+            "contact",
+            "careers",
+            "feedback",
+            "privacy_policy",
+            "terms_and_conditions",
+        ]
 
     def location(self, item):
         return reverse(item)

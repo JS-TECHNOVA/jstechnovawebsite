@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load editorjs %}
+
+{% block title %}<title>{{ seo.title }}</title>{% endblock %}
+
+{% block content %}
+    {% include 'components/TopBar.html' %}
+    {% include 'components/Header.html' %}
+
+    <section class="relative overflow-hidden bg-[linear-gradient(180deg,#061532_0%,#0d234f_55%,#1b4dc7_100%)] text-white">
+        <div class="pointer-events-none absolute inset-0">
+            <div class="absolute left-[-5%] top-0 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl"></div>
+            <div class="absolute bottom-0 right-[-5%] h-80 w-80 rounded-full bg-cyan-300/18 blur-3xl"></div>
+        </div>
+        <div class="container relative z-10 px-6 py-16 md:py-24">
+            <div class="mx-auto max-w-4xl text-center">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.32em] text-blue-100/80">{{ page_content.hero_badge }}</p>
+                <h1 class="mt-6 text-4xl font-black leading-[1.02] md:text-6xl">{{ page_content.hero_title }}</h1>
+                <p class="mx-auto mt-5 max-w-2xl text-base leading-8 text-blue-50/82 md:text-lg">{{ page_content.intro_text }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-space bg-[linear-gradient(180deg,#f6f9ff_0%,#eef4ff_100%)]">
+        <div class="container px-6">
+            <div class="mx-auto max-w-4xl rounded-[34px] border border-white/80 bg-white/95 p-7 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur md:p-10">
+                <div class="prose prose-slate max-w-none prose-headings:font-black prose-headings:text-slate-950 prose-p:text-slate-600 prose-p:leading-8 prose-li:text-slate-600 prose-strong:text-slate-900 prose-a:text-blue-700 prose-blockquote:border-l-blue-200 prose-blockquote:text-slate-600">
+                    {{ page_content.content_json|render_editorjs }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'components/Footer.html' %}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        if (window.AOS) {
+            AOS.init({ duration: 700, once: true, offset: 50, easing: "ease-out-cubic" });
+        }
+    </script>
+{% endblock %}

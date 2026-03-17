@@ -23,18 +23,41 @@
                                 <i class="fa-solid fa-chevron-down text-[10px] transition duration-300 group-hover/service:rotate-180"></i>
                             </a>
 
-                            <div class="pointer-events-none absolute left-1/2 top-full z-50 w-[320px] -translate-x-1/2 pt-5 opacity-0 transition duration-200 group-hover/service:pointer-events-auto group-hover/service:opacity-100">
-                                <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white p-3 shadow-[0_24px_80px_rgba(15,23,42,0.14)]">
-                                    <div class="rounded-[18px] bg-[linear-gradient(135deg,#03163a_0%,#0f4ddf_100%)] px-4 py-4 text-white">
-                                        <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/70">All Services</p>
-                                        <p class="mt-2 text-lg font-bold leading-tight">Explore what we design, build, and optimize.</p>
+                            <div class="pointer-events-none absolute left-1/2 top-full z-50 w-[560px] max-w-[calc(100vw-2rem)] -translate-x-1/2 pt-6 opacity-0 transition duration-200 group-hover/service:pointer-events-auto group-hover/service:opacity-100 xl:w-[620px]">
+                                <div class="relative overflow-hidden rounded-[32px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,251,255,0.95))] p-3 shadow-[0_30px_100px_rgba(15,23,42,0.22)] backdrop-blur-xl">
+                                    <!-- <div class="absolute left-1/2 top-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[5px] border-l border-t border-slate-200/80 bg-white"></div>
+                                    <div class="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.18)_0%,rgba(37,99,235,0)_70%)]"></div>
+                                    <div class="pointer-events-none absolute -left-12 bottom-6 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(14,165,233,0.12)_0%,rgba(14,165,233,0)_70%)]"></div> -->
+
+                                    <div class="relative overflow-hidden rounded-[22px] bg-[linear-gradient(135deg,#03163a_0%,#123f91_62%,#2f7bff_100%)] px-4 py-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(125,211,252,0.16),transparent_28%)]"></div>
+                                        <div class="relative">
+                                            <div class="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <p class="mt-2 max-w-[20ch] text-[1.15rem] font-black leading-[1.06]">Explore what we design, build, and optimize.</p>
+                                                </div>
+                                            
+                                            </div>
+                                            <p class="mt-3 text-[12px] leading-5 text-blue-100/82">Browse focused delivery areas, compare strengths quickly, and jump straight into the service that matches your goal.</p>
+                                        
+                                        </div>
                                     </div>
 
-                                    <div class="mt-3 space-y-1">
+                                    <div class="relative mt-3 grid gap-3 xl:grid-cols-2">
                                         {% for service in header_service_links %}
-                                            <a href="{{ service.get_absolute_url }}" class="flex items-center justify-between gap-3 rounded-[16px] px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-[#f4f8ff] hover:text-secondary">
-                                                <span class="min-w-0 truncate">{{ service.title }}</span>
-                                                <i class="fa-solid fa-arrow-right text-[10px] text-slate-400"></i>
+                                            <a href="{{ service.get_absolute_url }}" class="group flex h-full flex-col rounded-[22px] border border-slate-200/70 bg-white px-4 py-4 shadow-[0_10px_28px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-[linear-gradient(135deg,#f8fbff_0%,#eef5ff_100%)] hover:shadow-[0_18px_40px_rgba(37,99,235,0.12)]">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="grid h-12 w-12 shrink-0 place-items-center rounded-[16px] bg-[linear-gradient(145deg,#eff6ff_0%,#dbeafe_100%)] text-secondary shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition group-hover:bg-[linear-gradient(145deg,#2563eb_0%,#196bff_100%)] group-hover:text-white">
+                                                        <i class="{{ service.icon_class }}"></i>
+                                                    </span>
+                                                    <span class="ml-auto grid h-9 w-9 shrink-0 place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-400 transition group-hover:border-secondary group-hover:bg-secondary group-hover:text-white">
+                                                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="mt-4 min-w-0">
+                                                    <span class="block text-[1.05rem] font-black leading-[1.25] text-slate-800 transition group-hover:text-secondary">{{ service.title }}</span>
+                                                    <span class="mt-2 block text-sm leading-7 text-slate-500">{{ service.summary|truncatechars:110 }}</span>
+                                                </div>
                                             </a>
                                         {% endfor %}
                                     </div>

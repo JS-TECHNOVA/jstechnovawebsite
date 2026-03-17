@@ -81,6 +81,7 @@ class SiteSettings(SingletonModel):
     footer_address_label = models.CharField(max_length=80)
     footer_address = models.CharField(max_length=255)
     footer_phone = models.CharField(max_length=40)
+    footer_quick_links_title = models.CharField(max_length=80, default="Quick Links")
     footer_trust_text = models.CharField(max_length=120)
     footer_copyright_text = models.CharField(max_length=120)
     footer_policy_text = models.CharField(max_length=50)
@@ -236,6 +237,48 @@ class ContactPageContent(SeoFieldsMixin, SingletonModel):
         return "Contact Page Content"
 
 
+class FeedbackPageContent(SeoFieldsMixin, SingletonModel):
+    hero_badge = models.CharField(max_length=120)
+    hero_title = models.CharField(max_length=160)
+    hero_description = models.CharField(max_length=255)
+    mood_question = models.CharField(max_length=120)
+    rating_prompt = models.CharField(max_length=120)
+    image_prompt = models.CharField(max_length=120)
+    image_help_text = models.CharField(max_length=255)
+    name_label = models.CharField(max_length=80)
+    name_placeholder = models.CharField(max_length=255)
+    email_label = models.CharField(max_length=80)
+    email_placeholder = models.CharField(max_length=255)
+    message_label = models.CharField(max_length=120)
+    message_placeholder = models.CharField(max_length=255)
+    submit_text = models.CharField(max_length=60)
+    success_message = models.CharField(max_length=255)
+    privacy_note = models.CharField(max_length=255)
+
+    def __str__(self):
+        return "Feedback Page Content"
+
+
+class PrivacyPolicyPageContent(SeoFieldsMixin, SingletonModel):
+    hero_badge = models.CharField(max_length=120)
+    hero_title = models.CharField(max_length=160)
+    intro_text = models.CharField(max_length=255)
+    content_json = models.JSONField(default=dict, blank=True)
+
+    def __str__(self):
+        return "Privacy Policy Page Content"
+
+
+class TermsAndConditionsPageContent(SeoFieldsMixin, SingletonModel):
+    hero_badge = models.CharField(max_length=120)
+    hero_title = models.CharField(max_length=160)
+    intro_text = models.CharField(max_length=255)
+    content_json = models.JSONField(default=dict, blank=True)
+
+    def __str__(self):
+        return "Terms and Conditions Page Content"
+
+
 class ProjectPageContent(SeoFieldsMixin, SingletonModel):
     hero_title = models.CharField(max_length=120)
     hero_image_url = models.URLField()
@@ -350,6 +393,27 @@ class SocialLink(AuditFieldsMixin, models.Model):
 
     def __str__(self):
         return f"{self.label} ({self.location})"
+
+
+class FooterLink(AuditFieldsMixin, models.Model):
+    SECTION_QUICK = "quick"
+    SECTION_BOTTOM = "bottom"
+    SECTION_CHOICES = [
+        (SECTION_QUICK, "Quick Links"),
+        (SECTION_BOTTOM, "Bottom Bar Links"),
+    ]
+
+    label = models.CharField(max_length=80)
+    url = models.CharField(max_length=255)
+    section = models.CharField(max_length=20, choices=SECTION_CHOICES)
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["section", "order", "id"]
+
+    def __str__(self):
+        return f"{self.label} ({self.section})"
 
 
 class HeroSlide(OrderedModel):
@@ -478,6 +542,39 @@ class ContactSubmission(AuditFieldsMixin, models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.email})"
+
+
+def feedback_avatar_upload_to(instance, filename):
+    extension = Path(filename or "").suffix.lower() or ".png"
+    today = timezone.now()
+    return f"feedback/avatars/{today.year}/{today.month:02d}/{uuid4().hex}{extension}"
+
+
+class FeedbackSubmission(AuditFieldsMixin, models.Model):
+    FEELING_BAD = "bad"
+    FEELING_OKAY = "okay"
+    FEELING_GOOD = "good"
+    FEELING_EXCELLENT = "excellent"
+    FEELING_CHOICES = [
+        (FEELING_BAD, "Bad"),
+        (FEELING_OKAY, "Okay"),
+        (FEELING_GOOD, "Good"),
+        (FEELING_EXCELLENT, "Excellent"),
+    ]
+
+    name = models.CharField(max_length=120)
+    email = models.EmailField()
+    feeling = models.CharField(max_length=20, choices=FEELING_CHOICES)
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    message = models.TextField()
+    profile_image = models.ImageField(upload_to=feedback_avatar_upload_to, blank=True)
+    is_reviewed = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["is_reviewed", "-created_at", "-id"]
+
+    def __str__(self):
+        return f"{self.name} ({self.get_feeling_display()})"
 
 
 class Testimonial(OrderedModel):

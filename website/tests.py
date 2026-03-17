@@ -13,6 +13,9 @@ from .models import (
     BlogTag,
     CareerOpening,
     ContactSubmission,
+    FeedbackPageContent,
+    FeedbackSubmission,
+    FooterLink,
     FaqItem,
     HomeBlog,
     HomeFaq,
@@ -20,9 +23,11 @@ from .models import (
     HomeProject,
     HomeService,
     HomeTestimonial,
+    PrivacyPolicyPageContent,
     Project,
     Service,
     SiteSettings,
+    TermsAndConditionsPageContent,
     Testimonial,
     WhyChooseUsItem,
 )
@@ -177,11 +182,70 @@ class HomePageViewTests(TestCase):
         self.assertContains(response, HomePageContent.objects.get(pk=1).why_choose_title)
         self.assertContains(response, WhyChooseUsItem.objects.order_by("order", "id").first().title)
 
+    def test_homepage_footer_uses_repeatable_footer_links(self):
+        bootstrap_homepage_defaults()
+        site_settings = SiteSettings.objects.get(pk=1)
+        site_settings.footer_quick_links_title = "Explore"
+        site_settings.footer_policy_text = "Legacy policy"
+        site_settings.footer_terms_text = "Legacy terms"
+        site_settings.save()
+
+        FooterLink.objects.filter(section=FooterLink.SECTION_BOTTOM).delete()
+        FooterLink.objects.create(label="Privacy Center", url="/privacy/", section=FooterLink.SECTION_BOTTOM, order=1)
+        FooterLink.objects.create(label="Cookie Policy", url="/cookies/", section=FooterLink.SECTION_BOTTOM, order=2)
+
+        response = self.client.get(reverse("home"))
+
+        self.assertContains(response, "Explore")
+        self.assertContains(response, "Privacy Center")
+        self.assertContains(response, "Cookie Policy")
+        self.assertNotContains(response, "Legacy policy")
+        self.assertNotContains(response, "Legacy terms")
+
     def test_homepage_response_is_page_cached(self):
         response = self.client.get(reverse("home"))
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(f"max-age={settings.PAGE_CACHE_SECONDS}", response.headers.get("Cache-Control", ""))
+
+
+class StaticPageExperienceTests(TestCase):
+    def test_feedback_page_renders_and_accepts_submission(self):
+        bootstrap_homepage_defaults()
+
+        response = self.client.post(
+            reverse("feedback"),
+            {
+                "name": "Jamie Doe",
+                "email": "jamie@example.com",
+                "feeling": "good",
+                "rating": "4",
+                "message": "Fast communication and clear delivery.",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(FeedbackSubmission.objects.filter(email="jamie@example.com", feeling="good", rating=4).exists())
+        self.assertContains(response, FeedbackPageContent.objects.get(pk=1).success_message)
+
+    def test_privacy_policy_page_renders_editor_content(self):
+        bootstrap_homepage_defaults()
+
+        response = self.client.get(reverse("privacy_policy"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, PrivacyPolicyPageContent.objects.get(pk=1).hero_title)
+        self.assertContains(response, "information")
+
+    def test_terms_page_renders_editor_content(self):
+        bootstrap_homepage_defaults()
+
+        response = self.client.get(reverse("terms_and_conditions"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, TermsAndConditionsPageContent.objects.get(pk=1).hero_title)
+        self.assertContains(response, "services")
 
 
 class BlogPageTests(TestCase):

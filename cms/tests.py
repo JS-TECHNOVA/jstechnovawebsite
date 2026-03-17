@@ -7,7 +7,20 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
-from website.models import AuditLog, BlogPost, FaqItem, HomeBlog, MediaAsset, Service, Testimonial
+from website.models import (
+    AuditLog,
+    BlogPost,
+    FeedbackPageContent,
+    FooterLink,
+    FaqItem,
+    HomeBlog,
+    MediaAsset,
+    PrivacyPolicyPageContent,
+    Service,
+    SiteSettings,
+    TermsAndConditionsPageContent,
+    Testimonial,
+)
 from website.views import bootstrap_homepage_defaults
 
 
@@ -75,15 +88,185 @@ class CmsAccessTests(TestCase):
 
     def test_homepage_manager_supports_panel_navigation(self):
         self.client.login(username="staff", password="pass12345")
-        response = self.client.get(reverse("cms:homepage_manage"), {"panel": "hero-copy"})
+        response = self.client.get(reverse("cms:homepage_manage"), {"panel": "hero"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["cms_subsection"], "hero-copy")
+        self.assertEqual(response.context["cms_subsection"], "hero")
+
+    def test_homepage_manager_supports_footer_links_panel(self):
+        bootstrap_homepage_defaults()
+        self.client.login(username="staff", password="pass12345")
+
+        response = self.client.get(reverse("cms:homepage_manage"), {"panel": "footer-links"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["cms_subsection"], "footer-links")
+        self.assertIn("footer_quick_formset", response.context)
+        self.assertIn("footer_bottom_formset", response.context)
+
+    def test_staff_can_update_footer_link_title(self):
+        bootstrap_homepage_defaults()
+        self.client.login(username="staff", password="pass12345")
+
+        response = self.client.post(
+            reverse("cms:homepage_manage"),
+            {
+                "form_type": "footer_link_settings",
+                "panel": "footer-links",
+                "footer_settings-footer_quick_links_title": "Useful Links",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(SiteSettings.objects.get(pk=1).footer_quick_links_title, "Useful Links")
+
+    def test_staff_can_update_footer_links(self):
+        bootstrap_homepage_defaults()
+        self.client.login(username="staff", password="pass12345")
+        quick_link = FooterLink.objects.filter(section=FooterLink.SECTION_QUICK).order_by("order", "id").first()
+        bottom_link = FooterLink.objects.filter(section=FooterLink.SECTION_BOTTOM).order_by("order", "id").first()
+        FooterLink.objects.filter(section=FooterLink.SECTION_QUICK).exclude(pk=quick_link.pk).delete()
+        FooterLink.objects.filter(section=FooterLink.SECTION_BOTTOM).exclude(pk=bottom_link.pk).delete()
+
+        response = self.client.post(
+            reverse("cms:homepage_manage"),
+            {
+                "form_type": "footer_links",
+                "panel": "footer-links",
+                "footer_quick-TOTAL_FORMS": "1",
+                "footer_quick-INITIAL_FORMS": "1",
+                "footer_quick-MIN_NUM_FORMS": "0",
+                "footer_quick-MAX_NUM_FORMS": "1000",
+                "footer_quick-0-id": str(quick_link.id),
+                "footer_quick-0-label": "Company",
+                "footer_quick-0-url": "/company/",
+                "footer_quick-0-order": "1",
+                "footer_quick-0-is_active": "on",
+                "footer_bottom-TOTAL_FORMS": "1",
+                "footer_bottom-INITIAL_FORMS": "1",
+                "footer_bottom-MIN_NUM_FORMS": "0",
+                "footer_bottom-MAX_NUM_FORMS": "1000",
+                "footer_bottom-0-id": str(bottom_link.id),
+                "footer_bottom-0-label": "Legal",
+                "footer_bottom-0-url": "/legal/",
+                "footer_bottom-0-order": "1",
+                "footer_bottom-0-is_active": "on",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        quick_link.refresh_from_db()
+        bottom_link.refresh_from_db()
+        self.assertEqual(quick_link.label, "Company")
+        self.assertEqual(quick_link.url, "/company/")
+        self.assertEqual(bottom_link.label, "Legal")
+        self.assertEqual(bottom_link.url, "/legal/")
 
     def test_pages_manager_supports_panel_navigation(self):
         self.client.login(username="staff", password="pass12345")
-        response = self.client.get(reverse("cms:pages_manage"), {"panel": "contact-form"})
+        response = self.client.get(reverse("cms:pages_manage"), {"panel": "contact-page"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["cms_subsection"], "contact-form")
+        self.assertEqual(response.context["cms_subsection"], "contact-page")
+
+    def test_pages_manager_supports_feedback_and_legal_panels(self):
+        bootstrap_homepage_defaults()
+        self.client.login(username="staff", password="pass12345")
+
+        feedback_response = self.client.get(reverse("cms:pages_manage"), {"panel": "feedback-page"})
+        legal_response = self.client.get(reverse("cms:pages_manage"), {"panel": "legal-pages"})
+
+        self.assertEqual(feedback_response.status_code, 200)
+        self.assertEqual(feedback_response.context["cms_subsection"], "feedback-page")
+        self.assertIn("feedback_page_form", feedback_response.context)
+        self.assertEqual(legal_response.status_code, 200)
+        self.assertEqual(legal_response.context["cms_subsection"], "legal-pages")
+        self.assertIn("privacy_page_form", legal_response.context)
+        self.assertIn("terms_page_form", legal_response.context)
+
+    def test_legacy_grouped_panel_aliases_resolve_to_new_sections(self):
+        self.client.login(username="staff", password="pass12345")
+
+        homepage_response = self.client.get(reverse("cms:homepage_manage"), {"panel": "why-choose-items"})
+        pages_response = self.client.get(reverse("cms:pages_manage"), {"panel": "about-steps"})
+        legal_response = self.client.get(reverse("cms:pages_manage"), {"panel": "privacy-policy"})
+
+        self.assertEqual(homepage_response.status_code, 200)
+        self.assertEqual(homepage_response.context["cms_subsection"], "why-choose")
+        self.assertEqual(pages_response.status_code, 200)
+        self.assertEqual(pages_response.context["cms_subsection"], "about-values-process")
+        self.assertEqual(legal_response.status_code, 200)
+        self.assertEqual(legal_response.context["cms_subsection"], "legal-pages")
+
+    def test_staff_can_update_feedback_page_copy(self):
+        bootstrap_homepage_defaults()
+        self.client.login(username="staff", password="pass12345")
+
+        response = self.client.post(
+            reverse("cms:pages_manage"),
+            {
+                "form_type": "feedback_page",
+                "panel": "feedback-page",
+                "feedback_page-hero_badge": "Client Voice",
+                "feedback_page-hero_title": "Tell us what the experience felt like",
+                "feedback_page-hero_description": "Feedback page intro",
+                "feedback_page-mood_question": "How are you feeling today?",
+                "feedback_page-rating_prompt": "Rate the journey",
+                "feedback_page-image_prompt": "Add your photo",
+                "feedback_page-image_help_text": "Upload an image to personalize your response.",
+                "feedback_page-name_label": "Your name",
+                "feedback_page-name_placeholder": "Enter your name",
+                "feedback_page-email_label": "Your email",
+                "feedback_page-email_placeholder": "Enter your email",
+                "feedback_page-message_label": "What is on your mind?",
+                "feedback_page-message_placeholder": "Share your feedback",
+                "feedback_page-submit_text": "Send feedback",
+                "feedback_page-success_message": "Thank you for sharing your feedback.",
+                "feedback_page-privacy_note": "We only use this to improve our service.",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(FeedbackPageContent.objects.get(pk=1).hero_badge, "Client Voice")
+
+    def test_staff_can_update_legal_pages_from_grouped_panel(self):
+        bootstrap_homepage_defaults()
+        self.client.login(username="staff", password="pass12345")
+
+        privacy_response = self.client.post(
+            reverse("cms:pages_manage"),
+            {
+                "form_type": "privacy_page",
+                "panel": "legal-pages",
+                "privacy_page-hero_badge": "Privacy",
+                "privacy_page-hero_title": "Privacy Center",
+                "privacy_page-intro_text": "How we handle information.",
+                "privacy_page-content_json": json.dumps(
+                    {"blocks": [{"type": "paragraph", "data": {"text": "Privacy body"}}]}
+                ),
+            },
+            follow=True,
+        )
+        terms_response = self.client.post(
+            reverse("cms:pages_manage"),
+            {
+                "form_type": "terms_page",
+                "panel": "legal-pages",
+                "terms_page-hero_badge": "Terms",
+                "terms_page-hero_title": "Terms Center",
+                "terms_page-intro_text": "Rules for using the site.",
+                "terms_page-content_json": json.dumps(
+                    {"blocks": [{"type": "paragraph", "data": {"text": "Terms body"}}]}
+                ),
+            },
+            follow=True,
+        )
+
+        self.assertEqual(privacy_response.status_code, 200)
+        self.assertEqual(terms_response.status_code, 200)
+        self.assertEqual(PrivacyPolicyPageContent.objects.get(pk=1).hero_title, "Privacy Center")
+        self.assertEqual(TermsAndConditionsPageContent.objects.get(pk=1).hero_title, "Terms Center")
 
     def test_staff_without_permission_cannot_access_services_manager(self):
         self.client.login(username="limited", password="pass12345")

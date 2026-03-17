@@ -11,6 +11,7 @@ SITE_SETTINGS = {
     "footer_address_label": "Headquarters - USA",
     "footer_address": "993 Renner Burg, West Rond, MT 94251-030",
     "footer_phone": "+1 (009) 544-7818",
+    "footer_quick_links_title": "Quick Links",
     "footer_trust_text": "Trusted partner in digital excellence",
     "footer_copyright_text": "Copyright 2026 JS Technova. All rights reserved.",
     "footer_policy_text": "Policy & privacy",
@@ -194,6 +195,61 @@ CONTACT_PAGE_CONTENT = {
     "office_image_badge": "Office",
 }
 
+FEEDBACK_PAGE_CONTENT = {
+    "hero_badge": "Share Feedback",
+    "hero_title": "Tell us how the experience felt",
+    "hero_description": "A quick response from you helps us improve product quality, communication, and delivery clarity.",
+    "mood_question": "How are you feeling?",
+    "rating_prompt": "Rate the overall experience",
+    "image_prompt": "Profile image",
+    "image_help_text": "Optional. Upload a profile image to personalize your feedback card.",
+    "name_label": "Your Name",
+    "name_placeholder": "Enter your full name",
+    "email_label": "Your Email",
+    "email_placeholder": "you@example.com",
+    "message_label": "What's in your mind regarding us",
+    "message_placeholder": "Share your thoughts, suggestions, or what stood out most.",
+    "submit_text": "Send feedback",
+    "success_message": "Thanks for the feedback. We have saved your response.",
+    "privacy_note": "Your feedback is used internally to improve our service experience.",
+}
+
+PRIVACY_POLICY_PAGE_CONTENT = {
+    "hero_badge": "Legal",
+    "hero_title": "Privacy Policy",
+    "intro_text": "Explain how personal data is collected, stored, processed, and protected across the site and its services.",
+    "content_json": {
+        "blocks": [
+            {
+                "type": "header",
+                "data": {"text": "Privacy Policy", "level": 2},
+            },
+            {
+                "type": "paragraph",
+                "data": {"text": "Use this page to describe what information you collect, why you collect it, and how users can contact you regarding privacy requests."},
+            },
+        ]
+    },
+}
+
+TERMS_PAGE_CONTENT = {
+    "hero_badge": "Legal",
+    "hero_title": "Terms and Conditions",
+    "intro_text": "Outline acceptable use, responsibilities, limitations, and the legal terms that apply when visitors use the site.",
+    "content_json": {
+        "blocks": [
+            {
+                "type": "header",
+                "data": {"text": "Terms and Conditions", "level": 2},
+            },
+            {
+                "type": "paragraph",
+                "data": {"text": "Use this page to describe the rules, obligations, disclaimers, and other legal conditions for using your website and services."},
+            },
+        ]
+    },
+}
+
 PROJECT_PAGE_CONTENT = {
     "hero_title": "Projects",
     "hero_image_url": "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2200&auto=format&fit=crop",
@@ -289,6 +345,18 @@ SOCIAL_LINK_ROWS = [
     ("Instagram", "fa-brands fa-instagram", "#"),
     ("Twitter", "fa-brands fa-x-twitter", "#"),
     ("LinkedIn", "fa-brands fa-linkedin-in", "#"),
+]
+
+FOOTER_QUICK_LINK_ROWS = [
+    {"label": "About Us", "url": "/about/", "order": 1},
+    {"label": "Services", "url": "/services/", "order": 2},
+    {"label": "Projects", "url": "/projects/", "order": 3},
+    {"label": "Contact", "url": "/contact/", "order": 4},
+]
+
+FOOTER_BOTTOM_LINK_ROWS = [
+    {"label": "Policy & privacy", "url": "/privacy-policy/", "order": 1},
+    {"label": "Terms & conditions", "url": "/terms-and-conditions/", "order": 2},
 ]
 
 WHY_CHOOSE_US_ITEMS = [

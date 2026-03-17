@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, TemplateView
 
-from .forms import ContactInquiryForm
+from .forms import ContactInquiryForm, FeedbackForm
 from .models import (
     AboutPageContent,
     AboutProcessStep,
@@ -24,7 +24,10 @@ from .models import (
     CareerOpening,
     CareerPageContent,
     ContactPageContent,
+    FeedbackPageContent,
+    FeedbackSubmission,
     CoreFeature,
+    FooterLink,
     FaqItem,
     HeroSlide,
     HomeBlog,
@@ -35,6 +38,7 @@ from .models import (
     HomeTestimonial,
     MediaAsset,
     NavigationItem,
+    PrivacyPolicyPageContent,
     Project,
     ProjectPageContent,
     ProjectProcessStep,
@@ -43,6 +47,7 @@ from .models import (
     SiteSettings,
     SocialLink,
     Testimonial,
+    TermsAndConditionsPageContent,
     WhyChooseUsItem,
 )
 from .seed_data import (
@@ -50,12 +55,17 @@ from .seed_data import (
     BLOG_PAGE_CONTENT,
     CAREER_PAGE_CONTENT,
     CONTACT_PAGE_CONTENT,
+    FEEDBACK_PAGE_CONTENT,
+    FOOTER_BOTTOM_LINK_ROWS,
+    FOOTER_QUICK_LINK_ROWS,
     HOME_PAGE_CONTENT,
     NAVIGATION_ITEMS,
+    PRIVACY_POLICY_PAGE_CONTENT,
     PROJECT_PAGE_CONTENT,
     SERVICE_PAGE_CONTENT,
     SITE_SETTINGS,
     SOCIAL_LINK_ROWS,
+    TERMS_PAGE_CONTENT,
     WHY_CHOOSE_US_ITEMS,
 )
 from .seo import build_seo_context
@@ -175,6 +185,9 @@ def bootstrap_homepage_defaults():
     _ensure_singleton(BlogPageContent, BLOG_PAGE_CONTENT)
     _ensure_singleton(AboutPageContent, ABOUT_PAGE_CONTENT)
     _ensure_singleton(ContactPageContent, CONTACT_PAGE_CONTENT)
+    _ensure_singleton(FeedbackPageContent, FEEDBACK_PAGE_CONTENT)
+    _ensure_singleton(PrivacyPolicyPageContent, PRIVACY_POLICY_PAGE_CONTENT)
+    _ensure_singleton(TermsAndConditionsPageContent, TERMS_PAGE_CONTENT)
     _ensure_singleton(ProjectPageContent, PROJECT_PAGE_CONTENT)
     _ensure_singleton(CareerPageContent, CAREER_PAGE_CONTENT)
 
@@ -191,6 +204,19 @@ def bootstrap_homepage_defaults():
                     location=location,
                     order=index,
                 )
+
+    if not FooterLink.objects.exists():
+        for row in FOOTER_QUICK_LINK_ROWS:
+            FooterLink.objects.create(section=FooterLink.SECTION_QUICK, **row)
+        for row in FOOTER_BOTTOM_LINK_ROWS:
+            FooterLink.objects.create(section=FooterLink.SECTION_BOTTOM, **row)
+    else:
+        FooterLink.objects.filter(section=FooterLink.SECTION_BOTTOM, label__iexact="Policy & privacy", url="#").update(
+            url="/privacy-policy/"
+        )
+        FooterLink.objects.filter(section=FooterLink.SECTION_BOTTOM, label__iexact="Terms & conditions", url="#").update(
+            url="/terms-and-conditions/"
+        )
 
     _create_defaults(
         HeroSlide,
@@ -509,6 +535,8 @@ def get_site_context():
         "topbar_social_links": SocialLink.objects.filter(is_active=True, location=SocialLink.LOCATION_TOPBAR),
         "mobile_social_links": SocialLink.objects.filter(is_active=True, location=SocialLink.LOCATION_MOBILE),
         "footer_social_links": SocialLink.objects.filter(is_active=True, location=SocialLink.LOCATION_FOOTER),
+        "footer_quick_links": FooterLink.objects.filter(is_active=True, section=FooterLink.SECTION_QUICK),
+        "footer_bottom_links": FooterLink.objects.filter(is_active=True, section=FooterLink.SECTION_BOTTOM),
     }
 
 
@@ -699,6 +727,103 @@ class ContactPageView(SiteContentMixin, TemplateView):
                 "name": contact_page.hero_title if contact_page else "Contact",
                 "description": contact_page.intro_description if contact_page else "",
                 "url": self.request.build_absolute_uri(reverse("contact")),
+            },
+        )
+
+
+class FeedbackPageView(SiteContentMixin, TemplateView):
+    template_name = "feedback.html"
+
+    def get_feedback_page(self):
+        return FeedbackPageContent.objects.first()
+
+    def get_form(self, page_content, data=None, files=None):
+        return FeedbackForm(data=data, files=files, page_content=page_content)
+
+    def post(self, request, *args, **kwargs):
+        page_content = self.get_feedback_page()
+        form = self.get_form(page_content, data=request.POST, files=request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                page_content.success_message if page_content else "Thanks for the feedback. We have saved your response.",
+            )
+            return redirect("feedback")
+        context = self.get_context_data(feedback_form=form, feedback_page=page_content)
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        feedback_page = kwargs.get("feedback_page") or self.get_feedback_page()
+        context.update(
+            {
+                "feedback_page": feedback_page,
+                "feedback_form": kwargs.get("feedback_form") or self.get_form(feedback_page),
+                "feeling_choices": FeedbackSubmission.FEELING_CHOICES,
+                "rating_choices": range(1, 6),
+            }
+        )
+        return self.add_seo(
+            context,
+            source=feedback_page,
+            fallback_title=feedback_page.hero_title if feedback_page else "Feedback",
+            fallback_description=feedback_page.hero_description if feedback_page else "",
+            fallback_keywords="feedback, testimonial, service review",
+            schema={
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                "name": feedback_page.hero_title if feedback_page else "Feedback",
+                "description": feedback_page.hero_description if feedback_page else "",
+                "url": self.request.build_absolute_uri(reverse("feedback")),
+            },
+        )
+
+
+@method_decorator(cache_public_page, name="dispatch")
+class PrivacyPolicyPageView(SiteContentMixin, TemplateView):
+    template_name = "privacy_policy.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_content = PrivacyPolicyPageContent.objects.first()
+        context["page_content"] = page_content
+        return self.add_seo(
+            context,
+            source=page_content,
+            fallback_title=page_content.hero_title if page_content else "Privacy Policy",
+            fallback_description=page_content.intro_text if page_content else "",
+            fallback_keywords="privacy policy, legal, data protection",
+            schema={
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                "name": page_content.hero_title if page_content else "Privacy Policy",
+                "description": page_content.intro_text if page_content else "",
+                "url": self.request.build_absolute_uri(reverse("privacy_policy")),
+            },
+        )
+
+
+@method_decorator(cache_public_page, name="dispatch")
+class TermsAndConditionsPageView(SiteContentMixin, TemplateView):
+    template_name = "terms_and_conditions.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_content = TermsAndConditionsPageContent.objects.first()
+        context["page_content"] = page_content
+        return self.add_seo(
+            context,
+            source=page_content,
+            fallback_title=page_content.hero_title if page_content else "Terms and Conditions",
+            fallback_description=page_content.intro_text if page_content else "",
+            fallback_keywords="terms and conditions, legal, website terms",
+            schema={
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                "name": page_content.hero_title if page_content else "Terms and Conditions",
+                "description": page_content.intro_text if page_content else "",
+                "url": self.request.build_absolute_uri(reverse("terms_and_conditions")),
             },
         )
 

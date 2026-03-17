@@ -13,6 +13,8 @@ from .models import (
     ContactPageContent,
     ContactSubmission,
     CoreFeature,
+    FeedbackPageContent,
+    FeedbackSubmission,
     FaqItem,
     HeroSlide,
     HomeBlog,
@@ -26,10 +28,12 @@ from .models import (
     Project,
     ProjectPageContent,
     ProjectProcessStep,
+    PrivacyPolicyPageContent,
     Service,
     ServicePageContent,
     SiteSettings,
     SocialLink,
+    TermsAndConditionsPageContent,
     Testimonial,
     WhyChooseUsItem,
 )
@@ -75,6 +79,21 @@ class ContactPageContentAdmin(SingletonAdmin):
     pass
 
 
+@admin.register(FeedbackPageContent)
+class FeedbackPageContentAdmin(SingletonAdmin):
+    pass
+
+
+@admin.register(PrivacyPolicyPageContent)
+class PrivacyPolicyPageContentAdmin(SingletonAdmin):
+    pass
+
+
+@admin.register(TermsAndConditionsPageContent)
+class TermsAndConditionsPageContentAdmin(SingletonAdmin):
+    pass
+
+
 @admin.register(ContactSubmission)
 class ContactSubmissionAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "phone", "service_interest", "is_resolved", "created_at", "updated_at")
@@ -82,6 +101,15 @@ class ContactSubmissionAdmin(admin.ModelAdmin):
     search_fields = ("name", "email", "phone", "project_details")
     autocomplete_fields = ("service_interest",)
     ordering = ("is_resolved", "-created_at", "id")
+    readonly_fields = ("created_at", "updated_at", "created_by", "updated_by")
+
+
+@admin.register(FeedbackSubmission)
+class FeedbackSubmissionAdmin(admin.ModelAdmin):
+    list_display = ("name", "email", "feeling", "rating", "is_reviewed", "created_at")
+    list_filter = ("feeling", "rating", "is_reviewed")
+    search_fields = ("name", "email", "message")
+    ordering = ("is_reviewed", "-created_at", "-id")
     readonly_fields = ("created_at", "updated_at", "created_by", "updated_by")
 
 

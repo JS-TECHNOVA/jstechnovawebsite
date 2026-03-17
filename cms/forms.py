@@ -21,6 +21,9 @@ from website.models import (
     CareerPageContent,
     ContactPageContent,
     CoreFeature,
+    FeedbackPageContent,
+    FeedbackSubmission,
+    FooterLink,
     FaqItem,
     HeroSlide,
     HomeBlog,
@@ -31,6 +34,7 @@ from website.models import (
     HomeTestimonial,
     MediaAsset,
     NavigationItem,
+    PrivacyPolicyPageContent,
     Project,
     ProjectPageContent,
     ProjectProcessStep,
@@ -39,6 +43,7 @@ from website.models import (
     SiteSettings,
     SocialLink,
     Testimonial,
+    TermsAndConditionsPageContent,
     WhyChooseUsItem,
 )
 
@@ -341,17 +346,36 @@ class SiteSettingsForm(StyledModelForm):
             "footer_address_label",
             "footer_address",
             "footer_phone",
+            "footer_quick_links_title",
             "footer_trust_text",
             "footer_copyright_text",
-            "footer_policy_text",
-            "footer_policy_url",
-            "footer_terms_text",
-            "footer_terms_url",
             "quick_action_email_url",
             "quick_action_whatsapp_url",
             "quick_action_contact_url",
             "contact_auto_reply_message_json",
         ]
+
+
+class SingletonEditorContentForm(StyledModelForm):
+    editor_json_fields = ["content_json"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.editor_json_fields:
+            self.fields[field_name].widget = forms.HiddenInput()
+            initial_value = {"blocks": []}
+            if self.instance and self.instance.pk:
+                initial_value = getattr(self.instance, field_name) or {"blocks": []}
+            self.fields[field_name].initial = json.dumps(initial_value)
+
+    def clean_content_json(self):
+        return _clean_editor_payload(self.cleaned_data.get("content_json"))
+
+
+class FooterLinkSettingsForm(StyledModelForm):
+    class Meta:
+        model = SiteSettings
+        fields = ["footer_quick_links_title"]
 
 
 class HomePageContentForm(StyledModelForm):
@@ -493,6 +517,51 @@ class ContactPageContentForm(StyledModelForm):
         ] + SEO_FIELD_NAMES
 
 
+class FeedbackPageContentForm(StyledModelForm):
+    class Meta:
+        model = FeedbackPageContent
+        fields = [
+            "hero_badge",
+            "hero_title",
+            "hero_description",
+            "mood_question",
+            "rating_prompt",
+            "image_prompt",
+            "image_help_text",
+            "name_label",
+            "name_placeholder",
+            "email_label",
+            "email_placeholder",
+            "message_label",
+            "message_placeholder",
+            "submit_text",
+            "success_message",
+            "privacy_note",
+        ] + SEO_FIELD_NAMES
+
+
+class PrivacyPolicyPageContentForm(SingletonEditorContentForm):
+    class Meta:
+        model = PrivacyPolicyPageContent
+        fields = [
+            "hero_badge",
+            "hero_title",
+            "intro_text",
+            "content_json",
+        ] + SEO_FIELD_NAMES
+
+
+class TermsAndConditionsPageContentForm(SingletonEditorContentForm):
+    class Meta:
+        model = TermsAndConditionsPageContent
+        fields = [
+            "hero_badge",
+            "hero_title",
+            "intro_text",
+            "content_json",
+        ] + SEO_FIELD_NAMES
+
+
 class ProjectPageContentForm(StyledModelForm):
     class Meta:
         model = ProjectPageContent
@@ -580,6 +649,33 @@ class SocialLinkForm(StyledModelForm):
     class Meta:
         model = SocialLink
         fields = ["label", "icon_class", "url", "location", "order", "is_active"]
+
+
+class BaseFooterLinkForm(StyledModelForm):
+    fixed_section = ""
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.section = self.fixed_section
+        if commit:
+            instance.save()
+        return instance
+
+
+class QuickFooterLinkForm(BaseFooterLinkForm):
+    fixed_section = FooterLink.SECTION_QUICK
+
+    class Meta:
+        model = FooterLink
+        fields = ["label", "url", "order", "is_active"]
+
+
+class BottomFooterLinkForm(BaseFooterLinkForm):
+    fixed_section = FooterLink.SECTION_BOTTOM
+
+    class Meta:
+        model = FooterLink
+        fields = ["label", "url", "order", "is_active"]
 
 
 class AboutValueForm(StyledModelForm):
@@ -941,6 +1037,8 @@ CoreFeatureFormSet = modelformset_factory(CoreFeature, form=CoreFeatureForm, ext
 WhyChooseUsItemFormSet = modelformset_factory(WhyChooseUsItem, form=WhyChooseUsItemForm, extra=1, can_delete=True)
 NavigationItemFormSet = modelformset_factory(NavigationItem, form=NavigationItemForm, extra=1, can_delete=True)
 SocialLinkFormSet = modelformset_factory(SocialLink, form=SocialLinkForm, extra=1, can_delete=True)
+QuickFooterLinkFormSet = modelformset_factory(FooterLink, form=QuickFooterLinkForm, extra=1, can_delete=True)
+BottomFooterLinkFormSet = modelformset_factory(FooterLink, form=BottomFooterLinkForm, extra=1, can_delete=True)
 AboutValueFormSet = modelformset_factory(AboutValue, form=AboutValueForm, extra=1, can_delete=True)
 AboutProcessStepFormSet = modelformset_factory(AboutProcessStep, form=AboutProcessStepForm, extra=1, can_delete=True)
 ProjectProcessStepFormSet = modelformset_factory(ProjectProcessStep, form=ProjectProcessStepForm, extra=1, can_delete=True)

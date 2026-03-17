@@ -35,6 +35,8 @@ from website.models import (
     ContactPageContent,
     ContactSubmission,
     CoreFeature,
+    FeedbackPageContent,
+    FooterLink,
     FaqItem,
     HeroSlide,
     HomeBlog,
@@ -48,10 +50,12 @@ from website.models import (
     Project,
     ProjectPageContent,
     ProjectProcessStep,
+    PrivacyPolicyPageContent,
     Service,
     ServicePageContent,
     SiteSettings,
     SocialLink,
+    TermsAndConditionsPageContent,
     Testimonial,
     WhyChooseUsItem,
 )
@@ -69,7 +73,10 @@ from .forms import (
     CareerPageContentForm,
     ContactPageContentForm,
     CoreFeatureFormSet,
+    BottomFooterLinkFormSet,
+    FeedbackPageContentForm,
     FaqItemForm,
+    FooterLinkSettingsForm,
     HeroSlideFormSet,
     HomeBlogFormSet,
     HomeFaqFormSet,
@@ -81,12 +88,15 @@ from .forms import (
     ProjectEditorForm,
     ProjectPageContentForm,
     ProjectProcessStepFormSet,
+    PrivacyPolicyPageContentForm,
+    QuickFooterLinkFormSet,
     ServiceEditorForm,
     ServicePageContentForm,
     SEO_FIELD_NAMES,
     SiteSettingsForm,
     SocialLinkFormSet,
     TestimonialForm,
+    TermsAndConditionsPageContentForm,
     WhyChooseUsItemFormSet,
 )
 
@@ -483,6 +493,7 @@ def media_library_data_view(request):
     "website.view_whychooseusitem",
     "website.view_navigationitem",
     "website.view_sociallink",
+    "website.view_footerlink",
     any_perm=True,
 )
 def homepage_manage_view(request):
@@ -495,20 +506,56 @@ def homepage_manage_view(request):
     can_change_why_choose = request.user.has_perm("website.change_whychooseusitem")
     can_change_nav = request.user.has_perm("website.change_navigationitem")
     can_change_social = request.user.has_perm("website.change_sociallink")
+    can_change_footer_links = request.user.has_perm("website.change_footerlink")
+    can_change_footer_link_settings = request.user.has_perm("website.change_sitesettings")
+    homepage_panel_aliases = {
+        "hero-copy": "hero",
+        "hero-slides": "hero",
+        "why-choose-copy": "why-choose",
+        "why-choose-items": "why-choose",
+    }
+    requested_homepage_panel = (request.POST.get("panel") or request.GET.get("panel") or "").strip()
+    normalized_homepage_panel = homepage_panel_aliases.get(requested_homepage_panel)
+    if normalized_homepage_panel:
+        if request.method == "POST":
+            request.POST = request.POST.copy()
+            request.POST["panel"] = normalized_homepage_panel
+        else:
+            request.GET = request.GET.copy()
+            request.GET["panel"] = normalized_homepage_panel
     homepage_panels = [
         {"slug": "site", "label": "Site Settings", "can_view": request.user.has_perm("website.view_sitesettings")},
-        {"slug": "hero-copy", "label": "Hero Copy", "can_view": request.user.has_perm("website.view_homepagecontent")},
-        {"slug": "why-choose-copy", "label": "Why Choose Copy", "can_view": request.user.has_perm("website.view_homepagecontent")},
+        {
+            "slug": "hero",
+            "label": "Hero",
+            "can_view": request.user.has_perm("website.view_homepagecontent") or request.user.has_perm("website.view_heroslide"),
+        },
+        {
+            "slug": "core-features",
+            "label": "Core Features",
+            "can_view": request.user.has_perm("website.view_homepagecontent") or request.user.has_perm("website.view_corefeature"),
+        },
+        {
+            "slug": "why-choose",
+            "label": "Why Choose Us",
+            "can_view": request.user.has_perm("website.view_homepagecontent") or request.user.has_perm("website.view_whychooseusitem"),
+        },
         {"slug": "featured", "label": "Featured Sections", "can_view": request.user.has_perm("website.view_homepagecontent")},
         {"slug": "final-cta", "label": "Final CTA", "can_view": request.user.has_perm("website.view_homepagecontent")},
         {"slug": "seo", "label": "Homepage SEO", "can_view": request.user.has_perm("website.view_homepagecontent")},
-        {"slug": "hero-slides", "label": "Hero Slides", "can_view": request.user.has_perm("website.view_heroslide")},
-        {"slug": "core-features", "label": "Core Features", "can_view": request.user.has_perm("website.view_corefeature")},
-        {"slug": "why-choose-items", "label": "Why Choose Items", "can_view": request.user.has_perm("website.view_whychooseusitem")},
         {"slug": "navigation", "label": "Navigation", "can_view": request.user.has_perm("website.view_navigationitem")},
         {"slug": "social-links", "label": "Social Links", "can_view": request.user.has_perm("website.view_sociallink")},
+        {
+            "slug": "footer-links",
+            "label": "Footer Links",
+            "can_view": request.user.has_perm("website.view_footerlink") or request.user.has_perm("website.view_sitesettings"),
+        },
     ]
     active_panel, visible_homepage_panels = _resolve_manage_panel(request, homepage_panels)
+    active_homepage_panel_label = next(
+        (panel["label"] for panel in visible_homepage_panels if panel["slug"] == active_panel),
+        active_panel.replace("-", " ").title(),
+    )
 
     site_form = SiteSettingsForm(instance=site_settings, prefix="site")
     homepage_form = HomePageContentForm(instance=homepage_content, prefix="home")
@@ -522,6 +569,15 @@ def homepage_manage_view(request):
     social_formset = SocialLinkFormSet(
         queryset=SocialLink.objects.order_by("location", "order", "id"),
         prefix="social",
+    )
+    footer_link_settings_form = FooterLinkSettingsForm(instance=site_settings, prefix="footer_settings")
+    footer_quick_formset = QuickFooterLinkFormSet(
+        queryset=FooterLink.objects.filter(section=FooterLink.SECTION_QUICK).order_by("order", "id"),
+        prefix="footer_quick",
+    )
+    footer_bottom_formset = BottomFooterLinkFormSet(
+        queryset=FooterLink.objects.filter(section=FooterLink.SECTION_BOTTOM).order_by("order", "id"),
+        prefix="footer_bottom",
     )
 
     if request.method == "POST":
@@ -583,6 +639,30 @@ def homepage_manage_view(request):
                 social_formset.save()
                 messages.success(request, "Social links updated.")
                 return _redirect_to_panel("cms:homepage_manage", active_panel)
+        elif form_type == "footer_link_settings":
+            _require_perms(request, "website.change_sitesettings")
+            footer_link_settings_form = FooterLinkSettingsForm(request.POST, instance=site_settings, prefix="footer_settings")
+            if footer_link_settings_form.is_valid():
+                footer_link_settings_form.save()
+                messages.success(request, "Footer quick-link title updated.")
+                return _redirect_to_panel("cms:homepage_manage", active_panel)
+        elif form_type == "footer_links":
+            _require_perms(request, "website.change_footerlink")
+            footer_quick_formset = QuickFooterLinkFormSet(
+                request.POST,
+                queryset=FooterLink.objects.filter(section=FooterLink.SECTION_QUICK).order_by("order", "id"),
+                prefix="footer_quick",
+            )
+            footer_bottom_formset = BottomFooterLinkFormSet(
+                request.POST,
+                queryset=FooterLink.objects.filter(section=FooterLink.SECTION_BOTTOM).order_by("order", "id"),
+                prefix="footer_bottom",
+            )
+            if footer_quick_formset.is_valid() and footer_bottom_formset.is_valid():
+                footer_quick_formset.save()
+                footer_bottom_formset.save()
+                messages.success(request, "Footer links updated.")
+                return _redirect_to_panel("cms:homepage_manage", active_panel)
 
     if not can_change_site:
         _disable_form_fields(site_form)
@@ -598,6 +678,11 @@ def homepage_manage_view(request):
         _disable_formset_fields(nav_formset)
     if not can_change_social:
         _disable_formset_fields(social_formset)
+    if not can_change_footer_link_settings:
+        _disable_form_fields(footer_link_settings_form)
+    if not can_change_footer_links:
+        _disable_formset_fields(footer_quick_formset)
+        _disable_formset_fields(footer_bottom_formset)
 
     return render(
         request,
@@ -605,6 +690,7 @@ def homepage_manage_view(request):
         {
             "cms_section": "homepage_manage",
             "cms_subsection": active_panel,
+            "active_panel_label": active_homepage_panel_label,
             "homepage_panels": visible_homepage_panels,
             "site_form": site_form,
             "homepage_form": homepage_form,
@@ -613,6 +699,9 @@ def homepage_manage_view(request):
             "why_choose_formset": why_choose_formset,
             "nav_formset": nav_formset,
             "social_formset": social_formset,
+            "footer_link_settings_form": footer_link_settings_form,
+            "footer_quick_formset": footer_quick_formset,
+            "footer_bottom_formset": footer_bottom_formset,
             "seo_field_names": SEO_FIELD_NAMES,
             "can_change_site": can_change_site,
             "can_change_homepage": can_change_homepage,
@@ -621,12 +710,21 @@ def homepage_manage_view(request):
             "can_change_why_choose": can_change_why_choose,
             "can_change_nav": can_change_nav,
             "can_change_social": can_change_social,
+            "can_change_footer_link_settings": can_change_footer_link_settings,
+            "can_change_footer_links": can_change_footer_links,
             "home_hero_fields": [
                 "hero_cta_text",
                 "hero_cta_url",
                 "hero_right_title",
                 "hero_right_subtitle",
                 "hero_right_description",
+            ],
+            "home_core_fields": [
+                "core_badge",
+                "core_title",
+                "core_description",
+                "core_cta_text",
+                "core_cta_url",
             ],
             "home_why_choose_copy_fields": [
                 "why_choose_badge",
@@ -665,33 +763,78 @@ def homepage_manage_view(request):
     "website.view_contactpagecontent",
     "website.view_aboutvalue",
     "website.view_aboutprocessstep",
+    "website.view_feedbackpagecontent",
+    "website.view_privacypolicypagecontent",
+    "website.view_termsandconditionspagecontent",
     any_perm=True,
 )
 def pages_manage_view(request):
     about_page = AboutPageContent.objects.first()
     contact_page = ContactPageContent.objects.first()
+    feedback_page = FeedbackPageContent.objects.first()
+    privacy_page = PrivacyPolicyPageContent.objects.first()
+    terms_page = TermsAndConditionsPageContent.objects.first()
     can_change_about = request.user.has_perm("website.change_aboutpagecontent")
     can_change_contact = request.user.has_perm("website.change_contactpagecontent")
     can_change_values = request.user.has_perm("website.change_aboutvalue")
     can_change_steps = request.user.has_perm("website.change_aboutprocessstep")
+    can_change_feedback = request.user.has_perm("website.change_feedbackpagecontent")
+    can_change_privacy = request.user.has_perm("website.change_privacypolicypagecontent")
+    can_change_terms = request.user.has_perm("website.change_termsandconditionspagecontent")
+    pages_panel_aliases = {
+        "about-hero": "about-overview",
+        "about-story": "about-overview",
+        "about-company": "about-overview",
+        "about-mission": "about-overview",
+        "about-headings": "about-values-process",
+        "about-values": "about-values-process",
+        "about-steps": "about-values-process",
+        "contact-hero": "contact-page",
+        "contact-form": "contact-page",
+        "contact-office": "contact-page",
+        "privacy-policy": "legal-pages",
+        "terms-and-conditions": "legal-pages",
+    }
+    requested_pages_panel = (request.POST.get("panel") or request.GET.get("panel") or "").strip()
+    normalized_pages_panel = pages_panel_aliases.get(requested_pages_panel)
+    if normalized_pages_panel:
+        if request.method == "POST":
+            request.POST = request.POST.copy()
+            request.POST["panel"] = normalized_pages_panel
+        else:
+            request.GET = request.GET.copy()
+            request.GET["panel"] = normalized_pages_panel
     pages_panels = [
-        {"slug": "about-hero", "label": "About Hero", "can_view": request.user.has_perm("website.view_aboutpagecontent")},
-        {"slug": "about-story", "label": "About Story", "can_view": request.user.has_perm("website.view_aboutpagecontent")},
-        {"slug": "about-company", "label": "About Company", "can_view": request.user.has_perm("website.view_aboutpagecontent")},
-        {"slug": "about-mission", "label": "Mission & Vision", "can_view": request.user.has_perm("website.view_aboutpagecontent")},
-        {"slug": "about-headings", "label": "Values & Process", "can_view": request.user.has_perm("website.view_aboutpagecontent")},
+        {"slug": "about-overview", "label": "About Overview", "can_view": request.user.has_perm("website.view_aboutpagecontent")},
+        {
+            "slug": "about-values-process",
+            "label": "About Values & Process",
+            "can_view": request.user.has_perm("website.view_aboutpagecontent")
+            or request.user.has_perm("website.view_aboutvalue")
+            or request.user.has_perm("website.view_aboutprocessstep"),
+        },
         {"slug": "about-seo", "label": "About SEO", "can_view": request.user.has_perm("website.view_aboutpagecontent")},
-        {"slug": "about-values", "label": "About Values", "can_view": request.user.has_perm("website.view_aboutvalue")},
-        {"slug": "about-steps", "label": "About Steps", "can_view": request.user.has_perm("website.view_aboutprocessstep")},
-        {"slug": "contact-hero", "label": "Contact Hero", "can_view": request.user.has_perm("website.view_contactpagecontent")},
-        {"slug": "contact-form", "label": "Contact Form Copy", "can_view": request.user.has_perm("website.view_contactpagecontent")},
-        {"slug": "contact-office", "label": "Contact Office", "can_view": request.user.has_perm("website.view_contactpagecontent")},
+        {"slug": "contact-page", "label": "Contact Page", "can_view": request.user.has_perm("website.view_contactpagecontent")},
         {"slug": "contact-seo", "label": "Contact SEO", "can_view": request.user.has_perm("website.view_contactpagecontent")},
+        {"slug": "feedback-page", "label": "Feedback Page", "can_view": request.user.has_perm("website.view_feedbackpagecontent")},
+        {
+            "slug": "legal-pages",
+            "label": "Legal Pages",
+            "can_view": request.user.has_perm("website.view_privacypolicypagecontent")
+            or request.user.has_perm("website.view_termsandconditionspagecontent"),
+        },
     ]
     active_panel, visible_pages_panels = _resolve_manage_panel(request, pages_panels)
+    active_pages_panel_label = next(
+        (panel["label"] for panel in visible_pages_panels if panel["slug"] == active_panel),
+        active_panel.replace("-", " ").title(),
+    )
 
     about_form = AboutPageContentForm(instance=about_page, prefix="about")
     contact_form = ContactPageContentForm(instance=contact_page, prefix="contact")
+    feedback_page_form = FeedbackPageContentForm(instance=feedback_page, prefix="feedback_page")
+    privacy_page_form = PrivacyPolicyPageContentForm(instance=privacy_page, prefix="privacy_page")
+    terms_page_form = TermsAndConditionsPageContentForm(instance=terms_page, prefix="terms_page")
     about_values_formset = AboutValueFormSet(queryset=AboutValue.objects.order_by("order", "id"), prefix="values")
     about_steps_formset = AboutProcessStepFormSet(
         queryset=AboutProcessStep.objects.order_by("order", "id"),
@@ -713,6 +856,27 @@ def pages_manage_view(request):
             if contact_form.is_valid():
                 contact_form.save()
                 messages.success(request, "Contact page updated.")
+                return _redirect_to_panel("cms:pages_manage", active_panel)
+        elif form_type == "feedback_page":
+            _require_perms(request, "website.change_feedbackpagecontent")
+            feedback_page_form = FeedbackPageContentForm(request.POST, instance=feedback_page, prefix="feedback_page")
+            if feedback_page_form.is_valid():
+                feedback_page_form.save()
+                messages.success(request, "Feedback page updated.")
+                return _redirect_to_panel("cms:pages_manage", active_panel)
+        elif form_type == "privacy_page":
+            _require_perms(request, "website.change_privacypolicypagecontent")
+            privacy_page_form = PrivacyPolicyPageContentForm(request.POST, instance=privacy_page, prefix="privacy_page")
+            if privacy_page_form.is_valid():
+                privacy_page_form.save()
+                messages.success(request, "Privacy policy page updated.")
+                return _redirect_to_panel("cms:pages_manage", active_panel)
+        elif form_type == "terms_page":
+            _require_perms(request, "website.change_termsandconditionspagecontent")
+            terms_page_form = TermsAndConditionsPageContentForm(request.POST, instance=terms_page, prefix="terms_page")
+            if terms_page_form.is_valid():
+                terms_page_form.save()
+                messages.success(request, "Terms and conditions page updated.")
                 return _redirect_to_panel("cms:pages_manage", active_panel)
         elif form_type == "values":
             _require_perms(request, "website.change_aboutvalue")
@@ -741,6 +905,12 @@ def pages_manage_view(request):
         _disable_form_fields(about_form)
     if not can_change_contact:
         _disable_form_fields(contact_form)
+    if not can_change_feedback:
+        _disable_form_fields(feedback_page_form)
+    if not can_change_privacy:
+        _disable_form_fields(privacy_page_form)
+    if not can_change_terms:
+        _disable_form_fields(terms_page_form)
     if not can_change_values:
         _disable_formset_fields(about_values_formset)
     if not can_change_steps:
@@ -752,14 +922,21 @@ def pages_manage_view(request):
         {
             "cms_section": "pages_manage",
             "cms_subsection": active_panel,
+            "active_panel_label": active_pages_panel_label,
             "pages_panels": visible_pages_panels,
             "about_form": about_form,
             "contact_form": contact_form,
+            "feedback_page_form": feedback_page_form,
+            "privacy_page_form": privacy_page_form,
+            "terms_page_form": terms_page_form,
             "about_values_formset": about_values_formset,
             "about_steps_formset": about_steps_formset,
             "seo_field_names": SEO_FIELD_NAMES,
             "can_change_about": can_change_about,
             "can_change_contact": can_change_contact,
+            "can_change_feedback": can_change_feedback,
+            "can_change_privacy": can_change_privacy,
+            "can_change_terms": can_change_terms,
             "can_change_values": can_change_values,
             "can_change_steps": can_change_steps,
             "about_hero_fields": ["hero_title", "hero_image_url"],
@@ -831,6 +1008,18 @@ def pages_manage_view(request):
                 "office_image_title",
                 "office_image_description",
             ],
+            "feedback_intro_fields": ["hero_badge", "hero_title", "hero_description", "success_message", "privacy_note"],
+            "feedback_interaction_fields": ["mood_question", "rating_prompt", "image_prompt", "image_help_text"],
+            "feedback_form_fields": [
+                "name_label",
+                "name_placeholder",
+                "email_label",
+                "email_placeholder",
+                "message_label",
+                "message_placeholder",
+                "submit_text",
+            ],
+            "legal_copy_fields": ["hero_badge", "hero_title", "intro_text", "content_json"],
         },
     )
 

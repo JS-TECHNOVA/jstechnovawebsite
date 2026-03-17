@@ -75,6 +75,79 @@
     @apply text-lg font-semibold;
 }
 
+/* CMS button primitives for legacy templates that still use btn-* classes. */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-sm {
+    padding: 0.6rem 1rem;
+    font-size: 0.8125rem;
+}
+
+.btn-xs {
+    padding: 0.42rem 0.7rem;
+    font-size: 0.75rem;
+    border-radius: 0.9rem;
+}
+
+.btn-neutral {
+    background: linear-gradient(135deg, #2563eb 0%, #196bff 100%);
+    border-color: #196bff;
+    color: #ffffff;
+    box-shadow: 0 14px 30px rgba(25, 107, 255, 0.22);
+}
+
+.btn-neutral:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #145be6 100%);
+    border-color: #145be6;
+}
+
+.btn-outline {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #334155;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.btn-error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-color: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 14px 30px rgba(220, 38, 38, 0.18);
+}
+
+.btn-error:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    border-color: #b91c1c;
+}
+
 /* CMS form primitives must be explicit CSS classes because widgets are styled in Python. */
 .cms-input,
 .cms-select,
