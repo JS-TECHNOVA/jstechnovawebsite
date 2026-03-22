@@ -1724,9 +1724,6 @@
     --tw-border-style: dashed;
     border-style: dashed;
   }
-  .border-amber-100 {
-    border-color: var(--color-amber-100);
-  }
   .border-amber-200 {
     border-color: var(--color-amber-200);
   }
@@ -2202,9 +2199,6 @@
   }
   .bg-\[linear-gradient\(140deg\,rgba\(2\,18\,48\,0\.9\)_0\%\,rgba\(3\,22\,58\,0\.62\)_55\%\,rgba\(3\,22\,58\,0\.82\)_100\%\)\] {
     background-image: linear-gradient(140deg,rgba(2,18,48,0.9) 0%,rgba(3,22,58,0.62) 55%,rgba(3,22,58,0.82) 100%);
-  }
-  .bg-\[linear-gradient\(145deg\,\#041a46_0\%\,\#0c2d73_45\%\,\#2463eb_100\%\)\] {
-    background-image: linear-gradient(145deg,#041a46 0%,#0c2d73 45%,#2463eb 100%);
   }
   .bg-\[linear-gradient\(145deg\,\#eff6ff_0\%\,\#dbeafe_100\%\)\] {
     background-image: linear-gradient(145deg,#eff6ff 0%,#dbeafe 100%);
@@ -2693,10 +2687,6 @@
     --tw-leading: 1.2;
     line-height: 1.2;
   }
-  .leading-\[1\.04\] {
-    --tw-leading: 1.04;
-    line-height: 1.04;
-  }
   .leading-\[1\.05\] {
     --tw-leading: 1.05;
     line-height: 1.05;
@@ -2851,12 +2841,6 @@
     color: color-mix(in srgb, oklch(97% 0.014 254.604) 82%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--color-blue-50) 82%, transparent);
-    }
-  }
-  .text-blue-50\/85 {
-    color: color-mix(in srgb, oklch(97% 0.014 254.604) 85%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      color: color-mix(in oklab, var(--color-blue-50) 85%, transparent);
     }
   }
   .text-blue-100 {
@@ -3067,10 +3051,6 @@
     --tw-shadow: 0 24px 70px var(--tw-shadow-color, rgba(15,23,42,0.08));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .shadow-\[0_25px_70px_rgba\(15\,23\,42\,0\.08\)\] {
-    --tw-shadow: 0 25px 70px var(--tw-shadow-color, rgba(15,23,42,0.08));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
   .shadow-\[0_30px_80px_rgba\(3\,22\,58\,0\.28\)\] {
     --tw-shadow: 0 30px 80px var(--tw-shadow-color, rgba(3,22,58,0.28));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
@@ -3095,10 +3075,6 @@
     --tw-shadow: 0 30px 100px var(--tw-shadow-color, rgba(15,23,42,0.22));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .shadow-\[0_35px_100px_rgba\(15\,23\,42\,0\.18\)\] {
-    --tw-shadow: 0 35px 100px var(--tw-shadow-color, rgba(15,23,42,0.18));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
   .shadow-\[0_40px_120px_rgba\(15\,23\,42\,0\.12\)\] {
     --tw-shadow: 0 40px 120px var(--tw-shadow-color, rgba(15,23,42,0.12));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
@@ -3113,10 +3089,6 @@
   }
   .shadow-\[inset_0_1px_0_rgba\(255\,255\,255\,0\.08\)\] {
     --tw-shadow: inset 0 1px 0 var(--tw-shadow-color, rgba(255,255,255,0.08));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
-  .shadow-\[inset_0_1px_0_rgba\(255\,255\,255\,0\.12\)\] {
-    --tw-shadow: inset 0 1px 0 var(--tw-shadow-color, rgba(255,255,255,0.12));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .shadow-sm {
@@ -4167,11 +4139,6 @@
       font-size: 2.15rem;
     }
   }
-  .md\:text-\[2\.25rem\] {
-    @media (width >= 48rem) {
-      font-size: 2.25rem;
-    }
-  }
   .md\:leading-10 {
     @media (width >= 48rem) {
       --tw-leading: calc(var(--spacing) * 10);
@@ -4407,11 +4374,6 @@
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }
   }
-  .xl\:grid-cols-\[0\.95fr_1\.25fr\] {
-    @media (width >= 80rem) {
-      grid-template-columns: 0.95fr 1.25fr;
-    }
-  }
   .xl\:grid-cols-\[1\.15fr_0\.85fr\] {
     @media (width >= 80rem) {
       grid-template-columns: 1.15fr 0.85fr;
@@ -4435,11 +4397,6 @@
   .xl\:grid-cols-\[minmax\(0\,1fr\)_minmax\(0\,1\.2fr\)\] {
     @media (width >= 80rem) {
       grid-template-columns: minmax(0,1fr) minmax(0,1.2fr);
-    }
-  }
-  .xl\:items-start {
-    @media (width >= 80rem) {
-      align-items: flex-start;
     }
   }
   .xl\:gap-8 {
